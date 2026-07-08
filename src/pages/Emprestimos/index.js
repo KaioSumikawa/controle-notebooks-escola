@@ -1,0 +1,1 @@
+export { Emprestimos } from './Emprestimos';

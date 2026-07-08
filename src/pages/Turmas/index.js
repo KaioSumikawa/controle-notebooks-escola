@@ -1,0 +1,1 @@
+export { Turmas } from './Turmas';

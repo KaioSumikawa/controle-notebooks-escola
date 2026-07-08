@@ -1,0 +1,9 @@
+export { Dashboard } from './Dashboard';
+export { Emprestimos } from './Emprestimos';
+export { Devolucoes } from './Devolucoes';
+export { Notebooks } from './Notebooks';
+export { Historico } from './Historico';
+export { Relatorios } from './Relatorios';
+export { Configuracoes } from './Configuracoes';
+export { Turmas } from './Turmas';
+export { Login } from './Login';
