@@ -2,24 +2,20 @@ import { Sidebar } from '../Sidebar';
 import { Header } from '../Header';
 import { useState } from 'react';
 
-export function Layout({ 
-  children, 
+export function Layout({
+  children,
   title = 'Dashboard',
+  showSearch = false,
+  searchPlaceholder = 'Pesquisar...',
   onSearchChange,
-  searchValue = ''
+  searchValue = '',
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  const handleThemeToggle = () => {
-    setIsDarkMode(!isDarkMode);
-    // Lógica para aplicar tema escuro será implementada futuramente
-  };
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
-      <Sidebar 
+      <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
@@ -27,11 +23,11 @@ export function Layout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <Header 
+        <Header
           title={title}
           onMenuClick={() => setSidebarOpen(!sidebarOpen)}
-          isDarkMode={isDarkMode}
-          onThemeToggle={handleThemeToggle}
+          showSearch={showSearch}
+          searchPlaceholder={searchPlaceholder}
           onSearchChange={onSearchChange}
           searchValue={searchValue}
         />

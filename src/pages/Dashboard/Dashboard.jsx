@@ -1,96 +1,116 @@
-import { Layout } from '../../components';
-import { DashboardCard } from '../../components';
-import { Laptop, ClipboardList, Package, TrendingUp } from 'lucide-react';
+import { Layout, DashboardCard } from '../../components';
+import { Laptop, CheckCircle2, ClipboardList, Wrench } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { notebooks } from '../../data/notebooks';
+import { emprestimos } from '../../data/emprestimos';
 
 export function Dashboard() {
+  const navigate = useNavigate();
+
+  // Estatísticas dos notebooks
+  const totalNotebooks = notebooks.length;
+  const notebooksDisponiveis = notebooks.filter((notebook) => notebook.status === 'disponivel').length;
+  const notebooksManutencao = notebooks.filter((notebook) => notebook.status === 'manutencao').length;
+
+  // Empréstimos ativos
+  const emprestimosAtivos = emprestimos.filter((emprestimo) => emprestimo.status === 'ativo');
+
   return (
     <Layout title="Dashboard">
       <div className="space-y-8">
-        {/* Stats Cards */}
+        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
-            title="Notebooks Disponíveis"
-            value="28"
+            title="Total de Notebooks"
+            value={totalNotebooks}
             icon={Laptop}
             variant="primary"
-            trend={5}
-            description="Aptos para empréstimo"
+            description="Cadastrados no sistema"
+            onClick={() => navigate('/notebooks', { state: { filtro: 'todos' } })}
           />
           <DashboardCard
-            title="Empréstimos Ativos"
-            value="12"
+            title="Disponíveis"
+            value={notebooksDisponiveis}
+            icon={CheckCircle2}
+            variant="success"
+            description="Prontos para empréstimo"
+            onClick={() => navigate('/notebooks', { state: { filtro: 'disponivel' } })}
+          />
+          <DashboardCard
+            title="Emprestados"
+            value={emprestimosAtivos.length}
             icon={ClipboardList}
             variant="warning"
-            trend={-2}
-            description="Em posse de usuários"
+            description="Em uso pelos professores"
+            onClick={() => navigate('/notebooks', { state: { filtro: 'emprestado' } })}
           />
           <DashboardCard
-            title="Devoluções Pendentes"
-            value="3"
-            icon={Package}
+            title="Em Manutenção"
+            value={notebooksManutencao}
+            icon={Wrench}
             variant="danger"
-            trend={0}
-            description="Aguardando devolução"
-          />
-          <DashboardCard
-            title="Total de Transações"
-            value="256"
-            icon={TrendingUp}
-            variant="success"
-            trend={12}
-            description="Este mês"
+            description="Aguardando reparo"
+            onClick={() => navigate('/notebooks', { state: { filtro: 'manutencao' } })}
           />
         </div>
 
-        {/* Activity Section */}
+        {/* Conteúdo */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity */}
+          {/* Últimos empréstimos */}
           <div className="lg:col-span-2 bg-white rounded-lg border border-gray-200 p-6 card-shadow">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Atividade Recente</h2>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((item) => (
-                <div key={item} className="flex items-center justify-between pb-4 border-b border-gray-100 last:border-b-0">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">
-                      Empréstimo #{1000 + item}
-                    </p>
-                    <p className="text-xs text-gray-500">Aluno recebeu Notebook Dell Inspiron</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Últimos Empréstimos</h2>
+            <div className="space-y-5">
+              {emprestimosAtivos.length === 0 ? (
+                <p className="text-gray-500">Nenhum empréstimo ativo.</p>
+              ) : (
+                emprestimosAtivos.slice(0, 5).map((emprestimo) => (
+                  <div key={emprestimo.id} className="flex items-center justify-between border-b border-gray-100 pb-4">
+                    <div>
+                      <p className="font-medium text-gray-900">Notebook {emprestimo.notebookId}</p>
+                      <p className="text-sm text-gray-500">{emprestimo.professor} • {emprestimo.turma}</p>
+                    </div>
+                    <span className="text-sm text-gray-400">{emprestimo.dataEmprestimo} • {emprestimo.horaEmprestimo}</span>
                   </div>
-                  <span className="text-xs text-gray-400">há 2 horas</span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
-          {/* Quick Stats */}
-          <div className="bg-white rounded-lg border border-gray-200 p-6 card-shadow">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Resumo Rápido</h2>
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-gray-600">Taxa de Utilização</p>
-                  <span className="text-sm font-semibold text-gray-900">73%</span>
+          {/* Resumo e Avisos */}
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg border border-gray-200 p-6 card-shadow">
+              <h2 className="text-lg font-semibold text-gray-900 mb-5">Resumo Geral</h2>
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Professores</span>
+                  <span className="font-semibold">34</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '73%' }}></div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Turmas</span>
+                  <span className="font-semibold">18</span>
                 </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-gray-600">Saúde do Inventário</p>
-                  <span className="text-sm font-semibold text-gray-900">92%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '92%' }}></div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Alunos</span>
+                  <span className="font-semibold">712</span>
                 </div>
               </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-gray-600">Conformidade</p>
-                  <span className="text-sm font-semibold text-gray-900">85%</span>
+            </div>
+
+            {/* Avisos */}
+            <div className="bg-white rounded-lg border border-gray-200 p-6 card-shadow">
+              <h2 className="text-lg font-semibold text-gray-900 mb-5">Avisos</h2>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start gap-2">
+                  <span>🟢</span>
+                  <p>{notebooksManutencao === 0 ? 'Nenhum notebook em manutenção.' : `${notebooksManutencao} notebook(s) em manutenção.`}</p>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-purple-600 h-2 rounded-full" style={{ width: '85%' }}></div>
+                <div className="flex items-start gap-2">
+                  <span>📚</span>
+                  <p>{emprestimosAtivos.length} empréstimo(s) ativo(s) no momento.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span>✅</span>
+                  <p>Sistema funcionando normalmente.</p>
                 </div>
               </div>
             </div>

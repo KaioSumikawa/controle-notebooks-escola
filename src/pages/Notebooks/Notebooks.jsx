@@ -1,55 +1,131 @@
-import { Layout, NotebookCard, EmptyState, SearchBar } from '../../components';
+import { Layout, EmptyState, SearchBar, NotebookTable, NotebookModal } from '../../components';
 import { Laptop } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { notebooks } from '../../data/notebooks';
 
 export function Notebooks() {
+  const location = useLocation();
+
   const [searchValue, setSearchValue] = useState('');
+  const [filtro, setFiltro] = useState('todos');
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedNotebook, setSelectedNotebook] = useState(null);
+
+  useEffect(() => {
+    if (location.state?.filtro) {
+      setFiltro(location.state.filtro);
+    }
+  }, [location.state]);
+
+  const handleOpenModal = (notebook = null) => {
+    setSelectedNotebook(notebook);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedNotebook(null);
+  };
+
+  const handleSave = async (data) => {
+    console.log('Notebook salvo:', data);
+  };
+
+  const notebooksFiltrados = notebooks.filter((notebook) => {
+    const correspondeFiltro =
+      filtro === 'todos' || notebook.status === filtro;
+
+    const correspondeBusca =
+      notebook.id.toLowerCase().includes(searchValue.toLowerCase()) ||
+      notebook.modelo.toLowerCase().includes(searchValue.toLowerCase());
+
+    return correspondeFiltro && correspondeBusca;
+  });
 
   return (
-    <Layout title="Gerenciar Notebooks" onSearchChange={setSearchValue} searchValue={searchValue}>
+    <Layout
+      title="Gerenciar Notebooks"
+      onSearchChange={setSearchValue}
+      searchValue={searchValue}
+    >
       <div className="space-y-6">
-        {/* Header Section */}
+
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Notebooks</h2>
-            <p className="text-gray-600 mt-1">Gerencie o inventário de notebooks da escola</p>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Notebooks
+            </h2>
+
+            <p className="text-gray-600 mt-1">
+              Gerencie o inventário de notebooks da escola
+            </p>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+
+          <button
+            onClick={() => handleOpenModal()}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+          >
             + Adicionar Notebook
           </button>
         </div>
 
-        {/* Search and Filters */}
+
+        {/* Pesquisa e filtros */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
-          <SearchBar 
-            placeholder="Pesquisar por modelo, número de série ou ID..." 
+
+          <SearchBar
+            placeholder="Pesquisar por patrimônio, identificação ou modelo..."
             onChange={(e) => setSearchValue(e.target.value)}
             value={searchValue}
           />
-          
-          {/* Filter Buttons */}
+
           <div className="mt-4 flex flex-wrap gap-2">
-            <button className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors">
-              Todos
-            </button>
-            <button className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">
-              Disponíveis
-            </button>
-            <button className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">
-              Emprestados
-            </button>
-            <button className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors">
-              Manutenção
-            </button>
+            {[
+              ['todos', 'Todos'],
+              ['disponivel', 'Disponíveis'],
+              ['emprestado', 'Emprestados'],
+              ['manutencao', 'Manutenção'],
+            ].map(([valor, texto]) => (
+              <button
+                key={valor}
+                onClick={() => setFiltro(valor)}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filtro === valor
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {texto}
+              </button>
+            ))}
           </div>
+
         </div>
 
-        {/* Content Area */}
-        <EmptyState 
-          title="Nenhum notebook cadastrado"
-          description="Comece adicionando notebooks ao inventário"
-          icon={Laptop}
+
+        {/* Tabela de notebooks */}
+        {notebooksFiltrados.length === 0 ? (
+          <EmptyState
+            title="Nenhum notebook encontrado"
+            description="Tente alterar os filtros ou a pesquisa"
+            icon={Laptop}
+          />
+        ) : (
+          <NotebookTable notebooks={notebooksFiltrados} />
+        )}
+
+
+        {/* Modal de Notebook */}
+        <NotebookModal
+          isOpen={showModal}
+          notebook={selectedNotebook}
+          onSave={handleSave}
+          onClose={handleCloseModal}
         />
+
       </div>
     </Layout>
   );

@@ -1,10 +1,10 @@
-export function DashboardCard({ 
-  title, 
-  value, 
-  icon: Icon, 
+export function DashboardCard({
+  title,
+  value,
+  icon: Icon,
   variant = 'primary',
-  trend,
-  description 
+  description,
+  onClick,
 }) {
   const getVariantColor = (variant) => {
     switch (variant) {
@@ -37,20 +37,36 @@ export function DashboardCard({
   };
 
   return (
-    <div className={`border rounded-lg p-6 card-shadow transition-all ${getVariantColor(variant)}`}>
+    <div
+      onClick={onClick}
+      className={`
+        border rounded-lg p-6 card-shadow
+        transition-all duration-200
+        ${getVariantColor(variant)}
+        ${
+          onClick
+            ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-[0.98]'
+            : ''
+        }
+      `}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
+          <p className="text-sm font-medium text-gray-600 mb-1">
+            {title}
+          </p>
+
+          <p className="text-3xl font-bold text-gray-900">
+            {value}
+          </p>
+
           {description && (
-            <p className="text-xs text-gray-500 mt-2">{description}</p>
-          )}
-          {trend && (
-            <div className={`text-xs font-semibold mt-2 ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}% vs. mês anterior
-            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {description}
+            </p>
           )}
         </div>
+
         {Icon && (
           <div className={`${getIconColor(variant)} ml-4`}>
             <Icon size={28} strokeWidth={1.5} />
