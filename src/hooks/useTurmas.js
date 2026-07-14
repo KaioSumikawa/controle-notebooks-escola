@@ -1,104 +1,154 @@
 import { useState, useCallback, useEffect } from 'react';
-import { getTurmas, createTurma, updateTurma, deleteTurma } from '../services/turmasService';
+import { turmaService } from '../services/turmaService';
 
-/**
- * Hook para gerenciar turmas
- * @returns {Object} Estados e funções para CRUD de turmas
- */
 export function useTurmas() {
   const [turmas, setTurmas] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
+
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const clearMessages = useCallback(() => {
+    setError('');
+    setSuccess('');
+  }, []);
+
 
   // Buscar turmas
   const fetchTurmas = useCallback(async () => {
+    setIsLoading(true);
+    setError('');
+
     try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getTurmas();
+      const data = await turmaService.getAll();
+
       setTurmas(data);
     } catch (err) {
-      setError(err.message);
-      console.error(err);
+      setError(
+        err?.message || 'Erro ao carregar turmas.'
+      );
     } finally {
       setIsLoading(false);
     }
   }, []);
+
 
   // Criar turma
-  const handleCreate = useCallback(async (novasTurma) => {
+  const handleCreate = useCallback(async (data) => {
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
-      const novaTurma = await createTurma(novasTurma);
-      setTurmas((prev) => [novaTurma, ...prev]);
-      setSuccess('Turma criada com sucesso!');
+      const novaTurma = await turmaService.create(data);
+
+      setTurmas((prev) => [
+        ...prev,
+        novaTurma,
+      ]);
+
+      setSuccess('Turma criada com sucesso.');
+
       return novaTurma;
+
     } catch (err) {
-      setError(err.message);
-      console.error(err);
+      setError(
+        err?.message || 'Erro ao criar turma.'
+      );
+
       throw err;
+
     } finally {
       setIsLoading(false);
     }
   }, []);
+
 
   // Atualizar turma
-  const handleUpdate = useCallback(async (id, updates) => {
+  const handleUpdate = useCallback(async (id, data) => {
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
-      const turmaAtualizada = await updateTurma(id, updates);
-      setTurmas((prev) =>
-        prev.map((t) => (t.id === id ? turmaAtualizada : t))
+      const turmaAtualizada = await turmaService.update(
+        id,
+        data
       );
-      setSuccess('Turma atualizada com sucesso!');
+
+      setTurmas((prev) =>
+        prev.map((turma) =>
+          turma.id === id
+            ? turmaAtualizada
+            : turma
+        )
+      );
+
+      setSuccess('Turma atualizada com sucesso.');
+
       return turmaAtualizada;
+
     } catch (err) {
-      setError(err.message);
-      console.error(err);
+      setError(
+        err?.message || 'Erro ao atualizar turma.'
+      );
+
       throw err;
+
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Deletar turma
+
+  // Excluir turma
   const handleDelete = useCallback(async (id) => {
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+
     try {
-      setIsLoading(true);
-      setError(null);
-      setSuccess(null);
-      await deleteTurma(id);
-      setTurmas((prev) => prev.filter((t) => t.id !== id));
-      setSuccess('Turma excluída com sucesso!');
+      await turmaService.delete(id);
+
+      setTurmas((prev) =>
+        prev.filter(
+          (turma) => turma.id !== id
+        )
+      );
+
+      setSuccess('Turma excluída com sucesso.');
+
     } catch (err) {
-      setError(err.message);
-      console.error(err);
+      setError(
+        err?.message || 'Erro ao excluir turma.'
+      );
+
       throw err;
+
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Limpar mensagens de sucesso/erro
-  const clearMessages = useCallback(() => {
-    setError(null);
-    setSuccess(null);
-  }, []);
+
+  // Carrega automaticamente ao abrir a página
+  useEffect(() => {
+    fetchTurmas();
+  }, [fetchTurmas]);
+
 
   return {
     turmas,
     isLoading,
     error,
     success,
+
     fetchTurmas,
+
     handleCreate,
     handleUpdate,
     handleDelete,
+
     clearMessages,
   };
 }

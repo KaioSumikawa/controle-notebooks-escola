@@ -1,3 +1,5 @@
+const dataCadastro = new Date().toISOString();
+
 export const notebooks = Array.from({ length: 70 }, (_, index) => ({
   id: `NB-${String(index + 1).padStart(3, '0')}`,
   numero: index + 1,
@@ -27,5 +29,5 @@ export const notebooks = Array.from({ length: 70 }, (_, index) => ({
   ativo: true,
 
   // Data de cadastro
-  dataCadastro: new Date().toISOString(),
+  dataCadastro,
 }));

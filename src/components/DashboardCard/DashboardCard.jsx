@@ -10,12 +10,16 @@ export function DashboardCard({
     switch (variant) {
       case 'primary':
         return 'border-blue-200 bg-blue-50';
+
       case 'success':
         return 'border-green-200 bg-green-50';
+
       case 'danger':
         return 'border-red-200 bg-red-50';
+
       case 'warning':
         return 'border-yellow-200 bg-yellow-50';
+
       default:
         return 'border-gray-200 bg-gray-50';
     }
@@ -25,12 +29,16 @@ export function DashboardCard({
     switch (variant) {
       case 'primary':
         return 'text-blue-600';
+
       case 'success':
         return 'text-green-600';
+
       case 'danger':
         return 'text-red-600';
+
       case 'warning':
         return 'text-yellow-600';
+
       default:
         return 'text-gray-600';
     }
@@ -39,6 +47,16 @@ export function DashboardCard({
   return (
     <div
       onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (!onClick) return;
+
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       className={`
         border rounded-lg p-6 card-shadow
         transition-all duration-200
@@ -51,7 +69,9 @@ export function DashboardCard({
       `}
     >
       <div className="flex items-start justify-between">
+
         <div className="flex-1">
+
           <p className="text-sm font-medium text-gray-600 mb-1">
             {title}
           </p>
@@ -65,13 +85,18 @@ export function DashboardCard({
               {description}
             </p>
           )}
+
         </div>
 
         {Icon && (
-          <div className={`${getIconColor(variant)} ml-4`}>
-            <Icon size={28} strokeWidth={1.5} />
+          <div className={`ml-4 ${getIconColor(variant)}`}>
+            <Icon
+              size={28}
+              strokeWidth={1.5}
+            />
           </div>
         )}
+
       </div>
     </div>
   );

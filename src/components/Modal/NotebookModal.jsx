@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 
+const initialFormData = {
+  modelo: '',
+  patrimonio: '',
+  localizacao: '',
+  status: 'disponivel',
+  observacao: '',
+};
+
 /**
  * Modal para criar/editar notebooks
  */
@@ -11,48 +19,44 @@ export function NotebookModal({
   onSave,
   onClose,
 }) {
-  const [formData, setFormData] = useState({
-    modelo: '',
-    patrimonio: '',
-    localizacao: '',
-    status: 'disponivel',
-    observacao: '',
-  });
-
+  const [formData, setFormData] = useState(initialFormData);
   const [error, setError] = useState('');
 
-  // Reset do formulário quando abrir/fechar ou trocar notebook
   useEffect(() => {
-    if (isOpen) {
-      if (notebook) {
-        setFormData({
-          modelo: notebook.modelo || '',
-          patrimonio: notebook.patrimonio || '',
-          localizacao: notebook.localizacao || '',
-          status: notebook.status || 'disponivel',
-          observacao: notebook.observacao || '',
-        });
-      } else {
-        setFormData({
-          modelo: '',
-          patrimonio: '',
-          localizacao: '',
-          status: 'disponivel',
-          observacao: '',
-        });
-      }
+    if (!isOpen) return;
 
-      setError('');
+    if (notebook) {
+      setFormData({
+        modelo: notebook.modelo ?? '',
+        patrimonio: notebook.patrimonio ?? '',
+        localizacao: notebook.localizacao ?? '',
+        status: notebook.status ?? 'disponivel',
+        observacao: notebook.observacao ?? '',
+      });
+    } else {
+      setFormData(initialFormData);
     }
+
+    setError('');
   }, [isOpen, notebook]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const resetForm = () => {
+    setFormData(initialFormData);
+    setError('');
+  };
+
+  const handleChange = ({ target }) => {
+    const { name, value } = target;
 
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose?.();
   };
 
   const handleSubmit = async (e) => {
@@ -61,12 +65,12 @@ export function NotebookModal({
     setError('');
 
     if (!formData.modelo.trim()) {
-      setError('Modelo do notebook é obrigatório');
+      setError('Modelo do notebook é obrigatório.');
       return;
     }
 
     try {
-      await onSave({
+      await onSave?.({
         modelo: formData.modelo.trim(),
         patrimonio: formData.patrimonio.trim(),
         localizacao: formData.localizacao.trim(),
@@ -74,33 +78,20 @@ export function NotebookModal({
         observacao: formData.observacao.trim(),
       });
 
-      setFormData({
-        modelo: '',
-        patrimonio: '',
-        localizacao: '',
-        status: 'disponivel',
-        observacao: '',
-      });
-
-      onClose();
-
+      handleClose();
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || 'Erro ao salvar notebook.');
     }
   };
-
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={notebook ? 'Editar Notebook' : 'Novo Notebook'}
       size="md"
     >
-
       <form onSubmit={handleSubmit} className="space-y-4">
-
-
         {/* Modelo */}
         <div>
           <label
@@ -118,10 +109,9 @@ export function NotebookModal({
             onChange={handleChange}
             placeholder="Ex: Positivo Motion"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Patrimônio */}
         <div>
@@ -140,10 +130,9 @@ export function NotebookModal({
             onChange={handleChange}
             placeholder="Ex: 123456"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Localização */}
         <div>
@@ -162,10 +151,9 @@ export function NotebookModal({
             onChange={handleChange}
             placeholder="Ex: Laboratório de Informática"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Status */}
         <div>
@@ -182,23 +170,13 @@ export function NotebookModal({
             value={formData.status}
             onChange={handleChange}
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           >
-            <option value="disponivel">
-              Disponível
-            </option>
-
-            <option value="emprestado">
-              Emprestado
-            </option>
-
-            <option value="manutencao">
-              Manutenção
-            </option>
-
+            <option value="disponivel">Disponível</option>
+            <option value="emprestado">Emprestado</option>
+            <option value="manutencao">Manutenção</option>
           </select>
         </div>
-
 
         {/* Observação */}
         <div>
@@ -212,55 +190,46 @@ export function NotebookModal({
           <textarea
             id="notebook-observacao"
             name="observacao"
+            rows={3}
             value={formData.observacao}
             onChange={handleChange}
             placeholder="Ex: Tela com risco, carregador faltando..."
-            rows={3}
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Erro */}
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">
-              {error}
-            </p>
+            <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
-
         {/* Botões */}
         <div className="flex gap-3 pt-4">
-
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>
 
-
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             {isLoading
               ? 'Salvando...'
               : notebook
-                ? 'Atualizar'
-                : 'Cadastrar'}
+              ? 'Atualizar'
+              : 'Cadastrar'}
           </button>
-
         </div>
-
       </form>
-
     </Modal>
   );
 }

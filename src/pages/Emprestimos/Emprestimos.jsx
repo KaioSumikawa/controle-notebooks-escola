@@ -1,38 +1,99 @@
-import { Layout, EmptyState, SearchBar } from '../../components';
+import {
+  Layout,
+  EmptyState,
+  SearchBar,
+  EmprestimoModal,
+} from '../../components';
 import { ClipboardList } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useEmprestimos } from '../../hooks/useEmprestimos';
 
 export function Emprestimos() {
   const [searchValue, setSearchValue] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
+  const {
+    emprestimos,
+    handleCreate,
+  } = useEmprestimos();
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleSave = async (data) => {
+    await handleCreate(data);
+    handleCloseModal();
+  };
+
+  const emprestimosFiltrados = useMemo(() => {
+    const busca = searchValue.toLowerCase();
+
+    return emprestimos.filter((emprestimo) => {
+      return (
+        emprestimo.professor.toLowerCase().includes(busca) ||
+        emprestimo.turma.toLowerCase().includes(busca) ||
+        emprestimo.notebookId.toLowerCase().includes(busca)
+      );
+    });
+  }, [emprestimos, searchValue]);
 
   return (
-    <Layout title="Gerenciar Empréstimos" onSearchChange={setSearchValue} searchValue={searchValue}>
+    <Layout
+      title="Gerenciar Empréstimos"
+      onSearchChange={setSearchValue}
+      searchValue={searchValue}
+    >
       <div className="space-y-6">
-        {/* Header Section */}
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Empréstimos</h2>
-            <p className="text-gray-600 mt-1">Gerencie todos os empréstimos de notebooks</p>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Empréstimos
+            </h2>
+
+            <p className="text-gray-600 mt-1">
+              Gerencie todos os empréstimos de notebooks
+            </p>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+          >
             + Novo Empréstimo
           </button>
         </div>
 
-        {/* Search and Filters */}
+        {/* Pesquisa */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
-          <SearchBar 
-            placeholder="Pesquisar por aluno, notebook ou ID..." 
-            onChange={(e) => setSearchValue(e.target.value)}
+          <SearchBar
+            placeholder="Pesquisar por professor, turma ou notebook..."
             value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
         </div>
 
-        {/* Content Area */}
-        <EmptyState 
-          title="Nenhum empréstimo registrado"
-          description="Comece criando um novo empréstimo clicando no botão acima"
-          icon={ClipboardList}
+        {/* Conteúdo */}
+        {emprestimosFiltrados.length === 0 ? (
+          <EmptyState
+            title="Nenhum empréstimo registrado"
+            description="Clique em 'Novo Empréstimo' para registrar a primeira retirada de notebook."
+            icon={ClipboardList}
+          />
+        ) : (
+          <EmptyState
+            title="Tabela de empréstimos"
+            description="A tabela será implementada na próxima etapa."
+            icon={ClipboardList}
+          />
+        )}
+
+        {/* Modal */}
+        <EmprestimoModal
+          isOpen={showModal}
+          onClose={handleCloseModal}
+          onSave={handleSave}
         />
       </div>
     </Layout>

@@ -1,153 +1,188 @@
 import { supabase } from './supabase';
+import { turmas as turmasIniciais } from '../data/turmas';
 
-/**
- * Busca todas as turmas
- * @returns {Promise<Array>} Lista de turmas
- */
-export async function getTurmas() {
-  try {
-    const { data, error } = await supabase
-      .from('turmas')
-      .select('*')
-      .order('created_at', { ascending: false });
+let turmas = [...turmasIniciais];
 
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error('Erro ao buscar turmas:', error);
-    throw new Error(error.message || 'Erro ao buscar turmas');
-  }
-}
+export const turmaService = {
 
-/**
- * Busca uma turma pelo ID
- * @param {string} id - ID da turma
- * @returns {Promise<Object>} Dados da turma
- */
-export async function getTurmaById(id) {
-  try {
-    const { data, error } = await supabase
-      .from('turmas')
-      .select('*')
-      .eq('id', id)
-      .single();
+  async getAll() {
+    try {
+      const { data, error } = await supabase
+        .from('turmas')
+        .select('*')
+        .order('created_at', {
+          ascending: false,
+        });
 
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Erro ao buscar turma:', error);
-    throw new Error(error.message || 'Erro ao buscar turma');
-  }
-}
-
-/**
- * Cria uma nova turma
- * @param {Object} turma - Dados da turma { nome }
- * @returns {Promise<Object>} Turma criada
- */
-export async function createTurma(turma) {
-  try {
-    if (!turma.nome || turma.nome.trim() === '') {
-      throw new Error('Nome da turma é obrigatório');
-    }
-
-    const { data, error } = await supabase
-      .from('turmas')
-      .insert([{ nome: turma.nome.trim() }])
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        throw new Error('Essa turma já existe');
+      if (error) {
+        throw error;
       }
-      throw error;
+
+      return data || [];
+
+    } catch (error) {
+      console.warn(
+        'Supabase indisponível, usando dados locais:',
+        error.message
+      );
+
+      return [...turmas];
     }
-    return data;
-  } catch (error) {
-    console.error('Erro ao criar turma:', error);
-    throw new Error(error.message || 'Erro ao criar turma');
-  }
-}
+  },
 
-/**
- * Atualiza uma turma existente
- * @param {string} id - ID da turma
- * @param {Object} updates - Dados a atualizar { nome }
- * @returns {Promise<Object>} Turma atualizada
- */
-export async function updateTurma(id, updates) {
-  try {
-    if (!updates.nome || updates.nome.trim() === '') {
-      throw new Error('Nome da turma é obrigatório');
-    }
 
-    const { data, error } = await supabase
-      .from('turmas')
-      .update({ nome: updates.nome.trim() })
-      .eq('id', id)
-      .select()
-      .single();
+  async getById(id) {
+    try {
+      const { data, error } = await supabase
+        .from('turmas')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-    if (error) {
-      if (error.code === '23505') {
-        throw new Error('Essa turma já existe');
+      if (error) {
+        throw error;
       }
-      throw error;
+
+      return data;
+
+    } catch (error) {
+      return (
+        turmas.find(
+          (turma) => turma.id === id
+        ) || null
+      );
     }
-    return data;
-  } catch (error) {
-    console.error('Erro ao atualizar turma:', error);
-    throw new Error(error.message || 'Erro ao atualizar turma');
-  }
-}
+  },
 
-/**
- * Verifica se existe alunos vinculados a uma turma
- * @param {string} turmaId - ID da turma
- * @returns {Promise<number>} Quantidade de alunos
- */
-export async function countAlunosPorTurma(turmaId) {
-  try {
-    const { count, error } = await supabase
-      .from('alunos')
-      .select('*', { count: 'exact', head: true })
-      .eq('turma_id', turmaId);
 
-    if (error) throw error;
-    return count || 0;
-  } catch (error) {
-    console.error('Erro ao contar alunos:', error);
-    throw new Error(error.message || 'Erro ao contar alunos');
-  }
-}
+  async create(data) {
 
-/**
- * Deleta uma turma (apenas se não houver alunos vinculados)
- * @param {string} id - ID da turma
- * @returns {Promise<Object>} Resultado da deleção
- */
-export async function deleteTurma(id) {
-  try {
-    // Verificar se há alunos vinculados
-    const alunosCount = await countAlunosPorTurma(id);
-    if (alunosCount > 0) {
+    if (!data.nome || !data.nome.trim()) {
       throw new Error(
-        `Não é possível excluir esta turma. Existem ${alunosCount} aluno(s) vinculado(s).`
+        'Nome da turma é obrigatório.'
       );
     }
 
-    const { data, error } = await supabase
-      .from('turmas')
-      .delete()
-      .eq('id', id)
-      .select()
-      .single();
 
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Erro ao deletar turma:', error);
-    throw new Error(error.message || 'Erro ao deletar turma');
-  }
-}
+    try {
+      const { data: novaTurma, error } =
+        await supabase
+          .from('turmas')
+          .insert([
+            {
+              nome: data.nome.trim(),
+            },
+          ])
+          .select()
+          .single();
+
+
+      if (error) {
+        throw error;
+      }
+
+      return novaTurma;
+
+
+    } catch (error) {
+
+      const novaTurma = {
+        id: Date.now().toString(),
+        nome: data.nome.trim(),
+        created_at: new Date().toISOString(),
+      };
+
+
+      turmas.push(novaTurma);
+
+      return novaTurma;
+    }
+  },
+
+
+  async update(id, data) {
+
+    if (!data.nome || !data.nome.trim()) {
+      throw new Error(
+        'Nome da turma é obrigatório.'
+      );
+    }
+
+
+    try {
+      const { data: turmaAtualizada, error } =
+        await supabase
+          .from('turmas')
+          .update({
+            nome: data.nome.trim(),
+          })
+          .eq('id', id)
+          .select()
+          .single();
+
+
+      if (error) {
+        throw error;
+      }
+
+      return turmaAtualizada;
+
+
+    } catch (error) {
+
+      turmas = turmas.map((turma) =>
+        turma.id === id
+          ? {
+              ...turma,
+              nome: data.nome.trim(),
+            }
+          : turma
+      );
+
+
+      return turmas.find(
+        (turma) => turma.id === id
+      );
+    }
+  },
+
+
+  async delete(id) {
+
+    try {
+
+      const { error } =
+        await supabase
+          .from('turmas')
+          .delete()
+          .eq('id', id);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      return true;
+
+
+    } catch (error) {
+
+      turmas = turmas.filter(
+        (turma) => turma.id !== id
+      );
+
+
+      return true;
+    }
+  },
+
+
+  async reset() {
+
+    turmas = [...turmasIniciais];
+
+    return true;
+  },
+
+};

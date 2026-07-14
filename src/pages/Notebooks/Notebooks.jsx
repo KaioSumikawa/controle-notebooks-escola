@@ -1,11 +1,19 @@
-import { Layout, EmptyState, SearchBar, NotebookTable, NotebookModal } from '../../components';
+import {
+  Layout,
+  EmptyState,
+  SearchBar,
+  NotebookTable,
+  NotebookModal,
+} from '../../components';
 import { Laptop } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { notebooks } from '../../data/notebooks';
+import { notebooks as notebooksIniciais } from '../../data/notebooks';
 
 export function Notebooks() {
   const location = useLocation();
+
+  const [listaNotebooks, setListaNotebooks] = useState(notebooksIniciais);
 
   const [searchValue, setSearchValue] = useState('');
   const [filtro, setFiltro] = useState('todos');
@@ -30,16 +38,56 @@ export function Notebooks() {
   };
 
   const handleSave = async (data) => {
-    console.log('Notebook salvo:', data);
+    if (selectedNotebook) {
+      // Editar notebook
+      setListaNotebooks((prev) =>
+        prev.map((notebook) =>
+          notebook.id === selectedNotebook.id
+            ? {
+                ...notebook,
+                ...data,
+              }
+            : notebook
+        )
+      );
+    } else {
+      // Novo notebook
+      setListaNotebooks((prev) => {
+        const numero = prev.length + 1;
+
+        const novoNotebook = {
+          id: `NB-${String(numero).padStart(3, '0')}`,
+          numero,
+          qrCode: `NB-${String(numero).padStart(3, '0')}`,
+          modelo: '',
+          patrimonio: '',
+          localizacao: '',
+          responsavel: '',
+          turma: '',
+          observacao: '',
+          status: 'disponivel',
+          ativo: true,
+          dataCadastro: new Date().toISOString(),
+          ...data,
+        };
+
+        return [...prev, novoNotebook];
+      });
+    }
+
+    handleCloseModal();
   };
 
-  const notebooksFiltrados = notebooks.filter((notebook) => {
+  const notebooksFiltrados = listaNotebooks.filter((notebook) => {
     const correspondeFiltro =
       filtro === 'todos' || notebook.status === filtro;
 
+    const busca = searchValue.toLowerCase();
+
     const correspondeBusca =
-      notebook.id.toLowerCase().includes(searchValue.toLowerCase()) ||
-      notebook.modelo.toLowerCase().includes(searchValue.toLowerCase());
+      notebook.id.toLowerCase().includes(busca) ||
+      (notebook.modelo || '').toLowerCase().includes(busca) ||
+      (notebook.patrimonio || '').toLowerCase().includes(busca);
 
     return correspondeFiltro && correspondeBusca;
   });
@@ -72,14 +120,12 @@ export function Notebooks() {
           </button>
         </div>
 
-
         {/* Pesquisa e filtros */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
-
           <SearchBar
             placeholder="Pesquisar por patrimônio, identificação ou modelo..."
-            onChange={(e) => setSearchValue(e.target.value)}
             value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
           />
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -102,23 +148,23 @@ export function Notebooks() {
               </button>
             ))}
           </div>
-
         </div>
 
-
-        {/* Tabela de notebooks */}
+        {/* Tabela */}
         {notebooksFiltrados.length === 0 ? (
           <EmptyState
             title="Nenhum notebook encontrado"
-            description="Tente alterar os filtros ou a pesquisa"
+            description="Tente alterar os filtros ou a pesquisa."
             icon={Laptop}
           />
         ) : (
-          <NotebookTable notebooks={notebooksFiltrados} />
+          <NotebookTable
+            notebooks={notebooksFiltrados}
+            onEdit={handleOpenModal}
+          />
         )}
 
-
-        {/* Modal de Notebook */}
+        {/* Modal */}
         <NotebookModal
           isOpen={showModal}
           notebook={selectedNotebook}

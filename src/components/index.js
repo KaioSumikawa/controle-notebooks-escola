@@ -8,6 +8,13 @@ export { StatusBadge } from './StatusBadge';
 export { EmptyState } from './EmptyState';
 export { Loading } from './Loading';
 
-export { Modal, ConfirmModal, TurmaModal, NotebookModal, Toast } from './Modal';
+export {
+  Modal,
+  ConfirmModal,
+  TurmaModal,
+  NotebookModal,
+  EmprestimoModal,
+  Toast,
+} from './Modal';
 
 export { NotebookTable } from './NotebookTable/NotebookTable';
