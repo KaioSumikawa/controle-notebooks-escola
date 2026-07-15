@@ -1,7 +1,12 @@
 import { AlertCircle, Info } from 'lucide-react';
 
 /**
- * Modal de Confirmação Reutilizável
+ * Modal de confirmação reutilizável
+ *
+ * Usado para:
+ * - Exclusões
+ * - Confirmações críticas
+ * - Ações administrativas
  */
 export function ConfirmModal({
   isOpen = false,
@@ -17,50 +22,34 @@ export function ConfirmModal({
   if (!isOpen) return null;
 
 
-  const getColorClass = () => {
+  const getStyles = () => {
     switch (variant) {
       case 'danger':
-        return 'border-red-200 bg-red-50';
+        return {
+          container: 'border-red-200 bg-red-50',
+          icon: 'text-red-600',
+          button: 'bg-red-600 hover:bg-red-700',
+        };
 
       case 'info':
-        return 'border-blue-200 bg-blue-50';
+        return {
+          container: 'border-blue-200 bg-blue-50',
+          icon: 'text-blue-600',
+          button: 'bg-blue-600 hover:bg-blue-700',
+        };
 
       case 'warning':
       default:
-        return 'border-yellow-200 bg-yellow-50';
+        return {
+          container: 'border-yellow-200 bg-yellow-50',
+          icon: 'text-yellow-600',
+          button: 'bg-yellow-600 hover:bg-yellow-700',
+        };
     }
   };
 
 
-  const getIconColor = () => {
-    switch (variant) {
-      case 'danger':
-        return 'text-red-600';
-
-      case 'info':
-        return 'text-blue-600';
-
-      case 'warning':
-      default:
-        return 'text-yellow-600';
-    }
-  };
-
-
-  const getButtonColor = () => {
-    switch (variant) {
-      case 'danger':
-        return 'bg-red-600 hover:bg-red-700';
-
-      case 'info':
-        return 'bg-blue-600 hover:bg-blue-700';
-
-      case 'warning':
-      default:
-        return 'bg-yellow-600 hover:bg-yellow-700';
-    }
-  };
-
+  const styles = getStyles();
 
   const Icon = variant === 'info'
     ? Info
@@ -69,7 +58,7 @@ export function ConfirmModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center px-4"
       role="dialog"
       aria-modal="true"
     >
@@ -85,26 +74,38 @@ export function ConfirmModal({
       />
 
 
-      {/* Modal */}
+      {/* Conteúdo */}
       <div
         className={`
           relative
+          w-full
+          max-w-lg
           bg-white
           rounded-lg
           shadow-xl
-          max-w-md
-          w-11/12
           border
-          ${getColorClass()}
+          overflow-hidden
         `}
+        onClick={(e) => e.stopPropagation()}
       >
 
         {/* Header */}
-        <div className="flex items-center gap-3 p-6 border-b border-gray-200">
+        <div
+          className={`
+            flex
+            items-center
+            gap-3
+            px-6
+            py-5
+            border-b
+            border-gray-200
+            ${styles.container}
+          `}
+        >
 
           <Icon
-            size={24}
-            className={getIconColor()}
+            size={26}
+            className={styles.icon}
           />
 
           <h2 className="text-lg font-semibold text-gray-900">
@@ -114,18 +115,18 @@ export function ConfirmModal({
         </div>
 
 
-        {/* Conteúdo */}
+        {/* Mensagem */}
         <div className="p-6">
 
-          <p className="text-gray-700">
+          <p className="text-gray-700 leading-relaxed">
             {message}
           </p>
 
         </div>
 
 
-        {/* Footer */}
-        <div className="flex gap-3 p-6 border-t border-gray-200">
+        {/* Ações */}
+        <div className="flex gap-3 px-6 py-4 border-t border-gray-200">
 
           <button
             type="button"
@@ -135,11 +136,11 @@ export function ConfirmModal({
               flex-1
               px-4
               py-2
+              rounded-lg
+              font-medium
               text-gray-700
               bg-gray-100
               hover:bg-gray-200
-              rounded-lg
-              font-medium
               transition-colors
               disabled:opacity-50
             "
@@ -156,12 +157,12 @@ export function ConfirmModal({
               flex-1
               px-4
               py-2
-              text-white
               rounded-lg
               font-medium
+              text-white
               transition-colors
               disabled:opacity-50
-              ${getButtonColor()}
+              ${styles.button}
             `}
           >
             {

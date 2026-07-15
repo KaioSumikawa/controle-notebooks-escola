@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from './Modal';
 
-const initialFormData = {
+const createInitialFormData = () => ({
   modelo: '',
   patrimonio: '',
   localizacao: '',
   status: 'disponivel',
   observacao: '',
-};
+});
 
 /**
  * Modal para criar/editar notebooks
@@ -19,7 +19,7 @@ export function NotebookModal({
   onSave,
   onClose,
 }) {
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState(createInitialFormData());
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -34,14 +34,14 @@ export function NotebookModal({
         observacao: notebook.observacao ?? '',
       });
     } else {
-      setFormData(initialFormData);
+      setFormData(createInitialFormData());
     }
 
     setError('');
   }, [isOpen, notebook]);
 
   const resetForm = () => {
-    setFormData(initialFormData);
+    setFormData(createInitialFormData());
     setError('');
   };
 
@@ -55,29 +55,32 @@ export function NotebookModal({
   };
 
   const handleClose = () => {
+    if (isLoading) return;
+
     resetForm();
     onClose?.();
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     setError('');
 
-    if (!formData.modelo.trim()) {
-      setError('Modelo do notebook é obrigatório.');
+    const dados = {
+      modelo: formData.modelo.trim(),
+      patrimonio: formData.patrimonio.trim(),
+      localizacao: formData.localizacao.trim(),
+      status: formData.status,
+      observacao: formData.observacao.trim(),
+    };
+
+    if (!dados.modelo) {
+      setError('Informe o modelo do notebook.');
       return;
     }
 
     try {
-      await onSave?.({
-        modelo: formData.modelo.trim(),
-        patrimonio: formData.patrimonio.trim(),
-        localizacao: formData.localizacao.trim(),
-        status: formData.status,
-        observacao: formData.observacao.trim(),
-      });
-
+      await onSave?.(dados);
       handleClose();
     } catch (err) {
       setError(err?.message || 'Erro ao salvar notebook.');
@@ -107,9 +110,9 @@ export function NotebookModal({
             type="text"
             value={formData.modelo}
             onChange={handleChange}
-            placeholder="Ex: Positivo Motion"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            placeholder="Ex: Positivo Motion"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -128,9 +131,9 @@ export function NotebookModal({
             type="text"
             value={formData.patrimonio}
             onChange={handleChange}
-            placeholder="Ex: 123456"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            placeholder="Ex: 123456"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -149,9 +152,9 @@ export function NotebookModal({
             type="text"
             value={formData.localizacao}
             onChange={handleChange}
-            placeholder="Ex: Laboratório de Informática"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            placeholder="Ex: Laboratório de Informática"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -170,7 +173,7 @@ export function NotebookModal({
             value={formData.status}
             onChange={handleChange}
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="disponivel">Disponível</option>
             <option value="emprestado">Emprestado</option>
@@ -193,16 +196,18 @@ export function NotebookModal({
             rows={3}
             value={formData.observacao}
             onChange={handleChange}
-            placeholder="Ex: Tela com risco, carregador faltando..."
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            placeholder="Ex: Tela com risco, carregador faltando..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Erro */}
+        {/* Mensagem de erro */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="p-3 rounded-lg border border-red-200 bg-red-50">
+            <p className="text-sm text-red-700">
+              {error}
+            </p>
           </div>
         )}
 

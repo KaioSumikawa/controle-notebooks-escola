@@ -1,29 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from './Modal';
 
 const getToday = () => new Date().toISOString().split('T')[0];
 
-const initialFormData = {
+const createInitialState = () => ({
   notebook: '',
   professor: '',
   turma: '',
   dataEmprestimo: getToday(),
   observacao: '',
-};
+});
 
 /**
- * Modal para registrar empréstimos de notebooks
+ * Modal para registrar/editar empréstimos
  */
 export function EmprestimoModal({
   isOpen = false,
   emprestimo = null,
   notebooks = [],
+  professores = [],
   turmas = [],
   isLoading = false,
   onSave,
   onClose,
 }) {
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState(createInitialState());
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -38,23 +39,11 @@ export function EmprestimoModal({
         observacao: emprestimo.observacao ?? '',
       });
     } else {
-      setFormData({
-        ...initialFormData,
-        dataEmprestimo: getToday(),
-      });
+      setFormData(createInitialState());
     }
 
     setError('');
   }, [isOpen, emprestimo]);
-
-  const resetForm = () => {
-    setFormData({
-      ...initialFormData,
-      dataEmprestimo: getToday(),
-    });
-
-    setError('');
-  };
 
   const handleChange = ({ target }) => {
     const { name, value } = target;
@@ -66,7 +55,8 @@ export function EmprestimoModal({
   };
 
   const handleClose = () => {
-    resetForm();
+    setFormData(createInitialState());
+    setError('');
     onClose?.();
   };
 
@@ -80,21 +70,21 @@ export function EmprestimoModal({
       return;
     }
 
-    if (!formData.professor.trim()) {
-      setError('Informe o professor responsável.');
+    if (!formData.professor) {
+      setError('Selecione um professor.');
       return;
     }
 
-    if (!formData.turma.trim()) {
-      setError('Informe a turma.');
+    if (!formData.turma) {
+      setError('Selecione uma turma.');
       return;
     }
 
     try {
       await onSave?.({
         notebook: formData.notebook,
-        professor: formData.professor.trim(),
-        turma: formData.turma.trim(),
+        professor: formData.professor,
+        turma: formData.turma,
         dataEmprestimo: formData.dataEmprestimo,
         observacao: formData.observacao.trim(),
       });
@@ -112,7 +102,7 @@ export function EmprestimoModal({
       title={emprestimo ? 'Editar Empréstimo' : 'Novo Empréstimo'}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Notebook */}
         <div>
           <label
@@ -128,16 +118,13 @@ export function EmprestimoModal({
             value={formData.notebook}
             onChange={handleChange}
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           >
             <option value="">Selecione um notebook</option>
 
             {notebooks.map((notebook) => (
-              <option
-                key={notebook.id}
-                value={notebook.id}
-              >
-                {notebook.id} - {notebook.modelo}
+              <option key={notebook.id} value={notebook.id}>
+                {notebook.nome || notebook.numero || notebook.id}
               </option>
             ))}
           </select>
@@ -152,16 +139,38 @@ export function EmprestimoModal({
             Professor *
           </label>
 
-          <input
-            id="professor"
-            name="professor"
-            type="text"
-            value={formData.professor}
-            onChange={handleChange}
-            placeholder="Nome do professor"
-            disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-          />
+          {professores.length > 0 ? (
+            <select
+              id="professor"
+              name="professor"
+              value={formData.professor}
+              onChange={handleChange}
+              disabled={isLoading}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            >
+              <option value="">Selecione um professor</option>
+
+              {professores.map((professor) => (
+                <option
+                  key={professor.id}
+                  value={professor.nome}
+                >
+                  {professor.nome}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              id="professor"
+              name="professor"
+              type="text"
+              value={formData.professor}
+              onChange={handleChange}
+              placeholder="Nome do professor"
+              disabled={isLoading}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            />
+          )}
         </div>
 
         {/* Turma */}
@@ -180,7 +189,7 @@ export function EmprestimoModal({
               value={formData.turma}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             >
               <option value="">Selecione uma turma</option>
 
@@ -202,7 +211,7 @@ export function EmprestimoModal({
               onChange={handleChange}
               placeholder="Ex: 2º Ano A"
               disabled={isLoading}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
           )}
         </div>
@@ -223,7 +232,7 @@ export function EmprestimoModal({
             value={formData.dataEmprestimo}
             onChange={handleChange}
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
 
@@ -242,15 +251,15 @@ export function EmprestimoModal({
             rows={3}
             value={formData.observacao}
             onChange={handleChange}
-            placeholder="Observações sobre o empréstimo..."
+            placeholder="Observações..."
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
 
-        {/* Erro */}
+        {/* Mensagem de erro */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3">
             <p className="text-sm text-red-700">
               {error}
             </p>
@@ -258,12 +267,12 @@ export function EmprestimoModal({
         )}
 
         {/* Botões */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-3 pt-2">
           <button
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+            className="flex-1 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -271,13 +280,13 @@ export function EmprestimoModal({
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="flex-1 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
           >
             {isLoading
               ? 'Salvando...'
               : emprestimo
-                ? 'Atualizar'
-                : 'Registrar Empréstimo'}
+              ? 'Atualizar'
+              : 'Registrar Empréstimo'}
           </button>
         </div>
       </form>

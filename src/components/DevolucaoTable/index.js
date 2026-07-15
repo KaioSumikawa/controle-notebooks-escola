@@ -1,0 +1,1 @@
+export { DevolucaoTable } from './DevolucaoTable';

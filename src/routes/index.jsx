@@ -4,6 +4,7 @@ import {
   Emprestimos,
   Devolucoes,
   Notebooks,
+  Professores,
   Historico,
   Relatorios,
   Configuracoes,
@@ -29,6 +30,14 @@ export const router = createBrowserRouter([
     element: <Notebooks />,
   },
   {
+    path: '/professores',
+    element: <Professores />,
+  },
+  {
+    path: '/turmas',
+    element: <Turmas />,
+  },
+  {
     path: '/historico',
     element: <Historico />,
   },
@@ -39,10 +48,6 @@ export const router = createBrowserRouter([
   {
     path: '/configuracoes',
     element: <Configuracoes />,
-  },
-  {
-    path: '/turmas',
-    element: <Turmas />,
   },
   {
     path: '/login',

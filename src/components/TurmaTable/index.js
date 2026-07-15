@@ -1,0 +1,1 @@
+export { TurmaTable } from './TurmaTable';

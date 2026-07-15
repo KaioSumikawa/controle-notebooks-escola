@@ -1,11 +1,12 @@
+import { useMemo, useState } from 'react';
 import {
   Layout,
   EmptyState,
   SearchBar,
   EmprestimoModal,
+  EmprestimoTable,
 } from '../../components';
 import { ClipboardList } from 'lucide-react';
-import { useMemo, useState } from 'react';
 import { useEmprestimos } from '../../hooks/useEmprestimos';
 
 export function Emprestimos() {
@@ -13,7 +14,8 @@ export function Emprestimos() {
   const [showModal, setShowModal] = useState(false);
 
   const {
-    emprestimos,
+    emprestimos = [],
+    isLoading,
     handleCreate,
   } = useEmprestimos();
 
@@ -27,13 +29,15 @@ export function Emprestimos() {
   };
 
   const emprestimosFiltrados = useMemo(() => {
-    const busca = searchValue.toLowerCase();
+    const busca = searchValue.trim().toLowerCase();
+
+    if (!busca) return emprestimos;
 
     return emprestimos.filter((emprestimo) => {
       return (
-        emprestimo.professor.toLowerCase().includes(busca) ||
-        emprestimo.turma.toLowerCase().includes(busca) ||
-        emprestimo.notebookId.toLowerCase().includes(busca)
+        emprestimo.professor?.toLowerCase().includes(busca) ||
+        emprestimo.turma?.toLowerCase().includes(busca) ||
+        emprestimo.notebookId?.toLowerCase().includes(busca)
       );
     });
   }, [emprestimos, searchValue]);
@@ -41,8 +45,10 @@ export function Emprestimos() {
   return (
     <Layout
       title="Gerenciar Empréstimos"
-      onSearchChange={setSearchValue}
+      showSearch
+      searchPlaceholder="Pesquisar por professor, turma ou notebook..."
       searchValue={searchValue}
+      onSearchChange={setSearchValue}
     >
       <div className="space-y-6">
         {/* Header */}
@@ -53,7 +59,7 @@ export function Emprestimos() {
             </h2>
 
             <p className="text-gray-600 mt-1">
-              Gerencie todos os empréstimos de notebooks
+              Gerencie todos os empréstimos de notebooks.
             </p>
           </div>
 
@@ -77,15 +83,21 @@ export function Emprestimos() {
         {/* Conteúdo */}
         {emprestimosFiltrados.length === 0 ? (
           <EmptyState
-            title="Nenhum empréstimo registrado"
-            description="Clique em 'Novo Empréstimo' para registrar a primeira retirada de notebook."
+            title={
+              isLoading
+                ? 'Carregando empréstimos...'
+                : 'Nenhum empréstimo encontrado'
+            }
+            description={
+              isLoading
+                ? 'Aguarde alguns instantes.'
+                : 'Clique em "Novo Empréstimo" para registrar um empréstimo.'
+            }
             icon={ClipboardList}
           />
         ) : (
-          <EmptyState
-            title="Tabela de empréstimos"
-            description="A tabela será implementada na próxima etapa."
-            icon={ClipboardList}
+          <EmprestimoTable
+            emprestimos={emprestimosFiltrados}
           />
         )}
 

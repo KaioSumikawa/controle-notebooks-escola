@@ -13,58 +13,67 @@ export const notebookService = {
   },
 
   async getById(id) {
-    return notebooks.find((notebook) => notebook.id === id) ?? null;
+    const notebook = notebooks.find(
+      (notebook) => notebook.id === id
+    );
+
+    return notebook ? { ...notebook } : null;
   },
 
   async create(data) {
     const numero = gerarNumero();
 
+    const identificacao = gerarIdentificacao(numero);
+
     const novoNotebook = {
-      id: gerarIdentificacao(numero),
+      id: identificacao,
       numero,
-      qrCode: gerarIdentificacao(numero),
-      modelo: '',
-      patrimonio: '',
-      localizacao: '',
-      responsavel: '',
-      turma: '',
-      observacao: '',
-      status: 'disponivel',
+      qrCode: identificacao,
+      modelo: data.modelo ?? '',
+      patrimonio: data.patrimonio ?? '',
+      localizacao: data.localizacao ?? '',
+      responsavel: data.responsavel ?? '',
+      turma: data.turma ?? '',
+      observacao: data.observacao ?? '',
+      status: data.status ?? 'disponivel',
       ativo: true,
       dataCadastro: new Date().toISOString(),
-      ...data,
     };
 
     notebooks.push(novoNotebook);
 
-    return novoNotebook;
+    return { ...novoNotebook };
   },
 
   async update(id, data) {
-    let notebookAtualizado = null;
+    const index = notebooks.findIndex(
+      (notebook) => notebook.id === id
+    );
 
-    notebooks = notebooks.map((notebook) => {
-      if (notebook.id !== id) return notebook;
+    if (index === -1) {
+      return null;
+    }
 
-      notebookAtualizado = {
-        ...notebook,
-        ...data,
-      };
+    notebooks[index] = {
+      ...notebooks[index],
+      ...data,
+    };
 
-      return notebookAtualizado;
-    });
-
-    return notebookAtualizado;
+    return { ...notebooks[index] };
   },
 
   async delete(id) {
-    const quantidadeAnterior = notebooks.length;
-
-    notebooks = notebooks.filter(
-      (notebook) => notebook.id !== id
+    const index = notebooks.findIndex(
+      (notebook) => notebook.id === id
     );
 
-    return notebooks.length !== quantidadeAnterior;
+    if (index === -1) {
+      return false;
+    }
+
+    notebooks.splice(index, 1);
+
+    return true;
   },
 
   async reset() {

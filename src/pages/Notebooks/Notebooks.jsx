@@ -4,16 +4,25 @@ import {
   SearchBar,
   NotebookTable,
   NotebookModal,
+  Toast,
 } from '../../components';
 import { Laptop } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { notebooks as notebooksIniciais } from '../../data/notebooks';
+import { useNotebooks } from '../../hooks/useNotebooks';
 
 export function Notebooks() {
   const location = useLocation();
 
-  const [listaNotebooks, setListaNotebooks] = useState(notebooksIniciais);
+  const {
+    notebooks,
+    isLoading,
+    error,
+    success,
+    handleCreate,
+    handleUpdate,
+    clearMessages,
+  } = useNotebooks();
 
   const [searchValue, setSearchValue] = useState('');
   const [filtro, setFiltro] = useState('todos');
@@ -33,64 +42,35 @@ export function Notebooks() {
   };
 
   const handleCloseModal = () => {
-    setShowModal(false);
     setSelectedNotebook(null);
+    setShowModal(false);
   };
 
   const handleSave = async (data) => {
     if (selectedNotebook) {
-      // Editar notebook
-      setListaNotebooks((prev) =>
-        prev.map((notebook) =>
-          notebook.id === selectedNotebook.id
-            ? {
-                ...notebook,
-                ...data,
-              }
-            : notebook
-        )
-      );
+      await handleUpdate(selectedNotebook.id, data);
     } else {
-      // Novo notebook
-      setListaNotebooks((prev) => {
-        const numero = prev.length + 1;
-
-        const novoNotebook = {
-          id: `NB-${String(numero).padStart(3, '0')}`,
-          numero,
-          qrCode: `NB-${String(numero).padStart(3, '0')}`,
-          modelo: '',
-          patrimonio: '',
-          localizacao: '',
-          responsavel: '',
-          turma: '',
-          observacao: '',
-          status: 'disponivel',
-          ativo: true,
-          dataCadastro: new Date().toISOString(),
-          ...data,
-        };
-
-        return [...prev, novoNotebook];
-      });
+      await handleCreate(data);
     }
 
     handleCloseModal();
   };
 
-  const notebooksFiltrados = listaNotebooks.filter((notebook) => {
-    const correspondeFiltro =
-      filtro === 'todos' || notebook.status === filtro;
-
+  const notebooksFiltrados = useMemo(() => {
     const busca = searchValue.toLowerCase();
 
-    const correspondeBusca =
-      notebook.id.toLowerCase().includes(busca) ||
-      (notebook.modelo || '').toLowerCase().includes(busca) ||
-      (notebook.patrimonio || '').toLowerCase().includes(busca);
+    return notebooks.filter((notebook) => {
+      const correspondeFiltro =
+        filtro === 'todos' || notebook.status === filtro;
 
-    return correspondeFiltro && correspondeBusca;
-  });
+      const correspondeBusca =
+        notebook.id.toLowerCase().includes(busca) ||
+        (notebook.modelo || '').toLowerCase().includes(busca) ||
+        (notebook.patrimonio || '').toLowerCase().includes(busca);
+
+      return correspondeFiltro && correspondeBusca;
+    });
+  }, [notebooks, filtro, searchValue]);
 
   return (
     <Layout
@@ -99,7 +79,6 @@ export function Notebooks() {
       searchValue={searchValue}
     >
       <div className="space-y-6">
-
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -108,7 +87,7 @@ export function Notebooks() {
             </h2>
 
             <p className="text-gray-600 mt-1">
-              Gerencie o inventário de notebooks da escola
+              Gerencie o inventário de notebooks da escola.
             </p>
           </div>
 
@@ -120,7 +99,7 @@ export function Notebooks() {
           </button>
         </div>
 
-        {/* Pesquisa e filtros */}
+        {/* Pesquisa */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
           <SearchBar
             placeholder="Pesquisar por patrimônio, identificação ou modelo..."
@@ -150,11 +129,19 @@ export function Notebooks() {
           </div>
         </div>
 
-        {/* Tabela */}
+        {/* Conteúdo */}
         {notebooksFiltrados.length === 0 ? (
           <EmptyState
-            title="Nenhum notebook encontrado"
-            description="Tente alterar os filtros ou a pesquisa."
+            title={
+              isLoading
+                ? 'Carregando notebooks...'
+                : 'Nenhum notebook encontrado'
+            }
+            description={
+              isLoading
+                ? 'Aguarde um instante.'
+                : 'Tente alterar os filtros ou a pesquisa.'
+            }
             icon={Laptop}
           />
         ) : (
@@ -168,10 +155,17 @@ export function Notebooks() {
         <NotebookModal
           isOpen={showModal}
           notebook={selectedNotebook}
+          isLoading={isLoading}
           onSave={handleSave}
           onClose={handleCloseModal}
         />
 
+        {/* Toast */}
+        <Toast
+          message={success || error}
+          type={error ? 'error' : 'success'}
+          onClose={clearMessages}
+        />
       </div>
     </Layout>
   );

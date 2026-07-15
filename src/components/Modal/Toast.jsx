@@ -1,64 +1,147 @@
 import { useEffect } from 'react';
-import { CheckCircle, AlertCircle, X } from 'lucide-react';
+import {
+  CheckCircle,
+  AlertCircle,
+  AlertTriangle,
+  Info,
+  X,
+} from 'lucide-react';
+
 
 /**
- * Componente Toast para mensagens de sucesso/erro
+ * Toast reutilizável para mensagens do sistema
+ *
+ * Tipos:
+ * success | error | warning | info
  */
 export function Toast({
   message = '',
-  type = 'success', // success | error
+  type = 'success',
   duration = 3000,
-  onClose = () => {},
+  onClose,
 }) {
+
   useEffect(() => {
     if (!message) return;
 
     const timer = setTimeout(() => {
-      onClose();
+      onClose?.();
     }, duration);
 
     return () => clearTimeout(timer);
+
   }, [message, duration, onClose]);
+
 
   if (!message) return null;
 
-  const isSuccess = type === 'success';
 
-  const bgColor = isSuccess
-    ? 'bg-green-50 border-green-200'
-    : 'bg-red-50 border-red-200';
+  const configs = {
+    success: {
+      icon: CheckCircle,
+      container:
+        'bg-green-50 border-green-200',
+      iconColor:
+        'text-green-600',
+      textColor:
+        'text-green-900',
+    },
 
-  const iconColor = isSuccess
-    ? 'text-green-600'
-    : 'text-red-600';
+    error: {
+      icon: AlertCircle,
+      container:
+        'bg-red-50 border-red-200',
+      iconColor:
+        'text-red-600',
+      textColor:
+        'text-red-900',
+    },
 
-  const textColor = isSuccess
-    ? 'text-green-900'
-    : 'text-red-900';
+    warning: {
+      icon: AlertTriangle,
+      container:
+        'bg-yellow-50 border-yellow-200',
+      iconColor:
+        'text-yellow-600',
+      textColor:
+        'text-yellow-900',
+    },
 
-  const Icon = isSuccess ? CheckCircle : AlertCircle;
+    info: {
+      icon: Info,
+      container:
+        'bg-blue-50 border-blue-200',
+      iconColor:
+        'text-blue-600',
+      textColor:
+        'text-blue-900',
+    },
+  };
+
+
+  const config =
+    configs[type] || configs.success;
+
+
+  const Icon = config.icon;
+
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 max-w-sm p-4 rounded-lg border shadow-lg animate-slide-in ${bgColor}`}
+      className={`
+        fixed
+        bottom-5
+        right-5
+        z-50
+        flex
+        items-center
+        gap-3
+        max-w-sm
+        p-4
+        rounded-lg
+        border
+        shadow-lg
+        animate-in
+        slide-in-from-right-5
+        duration-300
+        ${config.container}
+      `}
+      role="alert"
     >
+
       <Icon
-        size={20}
-        className={iconColor}
+        size={22}
+        className={config.iconColor}
       />
 
-      <p className={`flex-1 text-sm font-medium ${textColor}`}>
+
+      <p
+        className={`
+          flex-1
+          text-sm
+          font-medium
+          ${config.textColor}
+        `}
+      >
         {message}
       </p>
 
+
       <button
         type="button"
-        onClick={onClose}
-        className="text-gray-400 hover:text-gray-600 transition-colors"
+        onClick={() => onClose?.()}
+        className="
+          text-gray-400
+          hover:text-gray-600
+          transition-colors
+        "
         aria-label="Fechar mensagem"
       >
+
         <X size={18} />
+
       </button>
+
     </div>
   );
 }

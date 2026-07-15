@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { notebooks as notebooksIniciais } from '../data/notebooks';
+import { useCallback, useEffect, useState } from 'react';
+import { notebookService } from '../services/notebookService';
 
 export function useNotebooks() {
-  const [notebooks, setNotebooks] = useState(notebooksIniciais);
+  const [notebooks, setNotebooks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -12,39 +12,30 @@ export function useNotebooks() {
     setSuccess('');
   };
 
-  const fetchNotebooks = async () => {
+  const fetchNotebooks = useCallback(async () => {
     setIsLoading(true);
+    setError('');
 
     try {
-      // Futuramente buscará do Supabase
-      setNotebooks((prev) => [...prev]);
+      const data = await notebookService.getAll();
+      setNotebooks(data);
     } catch (err) {
       setError(err?.message || 'Erro ao carregar os notebooks.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchNotebooks();
+  }, [fetchNotebooks]);
 
   const handleCreate = async (data) => {
     setIsLoading(true);
+    clearMessages();
 
     try {
-      const numero = notebooks.length + 1;
-
-      const novoNotebook = {
-        id: `NB-${String(numero).padStart(3, '0')}`,
-        numero,
-        qrCode: `NB-${String(numero).padStart(3, '0')}`,
-        ativo: true,
-        dataCadastro: new Date().toISOString(),
-        responsavel: '',
-        turma: '',
-        status: data.status ?? 'disponivel',
-        modelo: data.modelo ?? '',
-        patrimonio: data.patrimonio ?? '',
-        localizacao: data.localizacao ?? '',
-        observacao: data.observacao ?? '',
-      };
+      const novoNotebook = await notebookService.create(data);
 
       setNotebooks((prev) => [...prev, novoNotebook]);
 
@@ -61,20 +52,24 @@ export function useNotebooks() {
 
   const handleUpdate = async (id, data) => {
     setIsLoading(true);
+    clearMessages();
 
     try {
+      const notebookAtualizado = await notebookService.update(id, data);
+
+      if (!notebookAtualizado) {
+        throw new Error('Notebook não encontrado.');
+      }
+
       setNotebooks((prev) =>
         prev.map((notebook) =>
-          notebook.id === id
-            ? {
-                ...notebook,
-                ...data,
-              }
-            : notebook
+          notebook.id === id ? notebookAtualizado : notebook
         )
       );
 
       setSuccess('Notebook atualizado com sucesso.');
+
+      return notebookAtualizado;
     } catch (err) {
       setError(err?.message || 'Erro ao atualizar notebook.');
       throw err;
@@ -85,8 +80,11 @@ export function useNotebooks() {
 
   const handleDelete = async (id) => {
     setIsLoading(true);
+    clearMessages();
 
     try {
+      await notebookService.delete(id);
+
       setNotebooks((prev) =>
         prev.filter((notebook) => notebook.id !== id)
       );

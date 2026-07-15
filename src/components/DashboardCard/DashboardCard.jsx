@@ -1,3 +1,31 @@
+const variants = {
+  primary: {
+    container: 'border-blue-200 bg-blue-50',
+    icon: 'text-blue-600',
+  },
+
+  success: {
+    container: 'border-green-200 bg-green-50',
+    icon: 'text-green-600',
+  },
+
+  danger: {
+    container: 'border-red-200 bg-red-50',
+    icon: 'text-red-600',
+  },
+
+  warning: {
+    container: 'border-yellow-200 bg-yellow-50',
+    icon: 'text-yellow-600',
+  },
+
+  default: {
+    container: 'border-gray-200 bg-gray-50',
+    icon: 'text-gray-600',
+  },
+};
+
+
 export function DashboardCard({
   title,
   value,
@@ -6,98 +34,104 @@ export function DashboardCard({
   description,
   onClick,
 }) {
-  const getVariantColor = (variant) => {
-    switch (variant) {
-      case 'primary':
-        return 'border-blue-200 bg-blue-50';
 
-      case 'success':
-        return 'border-green-200 bg-green-50';
+  const style =
+    variants[variant] || variants.default;
 
-      case 'danger':
-        return 'border-red-200 bg-red-50';
 
-      case 'warning':
-        return 'border-yellow-200 bg-yellow-50';
+  const handleKeyDown = (event) => {
+    if (!onClick) return;
 
-      default:
-        return 'border-gray-200 bg-gray-50';
+
+    if (
+      event.key === 'Enter' ||
+      event.key === ' '
+    ) {
+      event.preventDefault();
+      onClick?.();
     }
   };
 
-  const getIconColor = (variant) => {
-    switch (variant) {
-      case 'primary':
-        return 'text-blue-600';
-
-      case 'success':
-        return 'text-green-600';
-
-      case 'danger':
-        return 'text-red-600';
-
-      case 'warning':
-        return 'text-yellow-600';
-
-      default:
-        return 'text-gray-600';
-    }
-  };
 
   return (
     <div
-      onClick={onClick}
+      onClick={() => onClick?.()}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
-      onKeyDown={(e) => {
-        if (!onClick) return;
-
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
+      onKeyDown={handleKeyDown}
+      aria-label={
+        onClick
+          ? `${title}: ${value}`
+          : undefined
+      }
       className={`
-        border rounded-lg p-6 card-shadow
-        transition-all duration-200
-        ${getVariantColor(variant)}
+        border
+        rounded-lg
+        p-6
+        card-shadow
+        transition-all
+        duration-200
+        ${style.container}
         ${
           onClick
-            ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-[0.98]'
+            ? `
+              cursor-pointer
+              hover:shadow-lg
+              hover:-translate-y-1
+              active:scale-[0.98]
+            `
             : ''
         }
       `}
     >
+
       <div className="flex items-start justify-between">
 
+
+        {/* Informações */}
         <div className="flex-1">
 
           <p className="text-sm font-medium text-gray-600 mb-1">
             {title}
           </p>
 
+
           <p className="text-3xl font-bold text-gray-900">
             {value}
           </p>
 
-          {description && (
-            <p className="text-xs text-gray-500 mt-2">
-              {description}
-            </p>
-          )}
+
+          {
+            description && (
+              <p className="text-xs text-gray-500 mt-2">
+                {description}
+              </p>
+            )
+          }
 
         </div>
 
-        {Icon && (
-          <div className={`ml-4 ${getIconColor(variant)}`}>
-            <Icon
-              size={28}
-              strokeWidth={1.5}
-            />
-          </div>
-        )}
+
+        {/* Ícone */}
+        {
+          Icon && (
+            <div
+              className={`
+                ml-4
+                ${style.icon}
+              `}
+            >
+              <Icon
+                size={30}
+                strokeWidth={1.5}
+              />
+            </div>
+          )
+        }
+
 
       </div>
+
     </div>
   );
 }
