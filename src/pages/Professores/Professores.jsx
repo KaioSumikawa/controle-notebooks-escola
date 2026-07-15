@@ -13,7 +13,7 @@ import { useProfessores } from '../../hooks/useProfessores';
 
 export function Professores() {
   const {
-    professores,
+    professores = [],
     isLoading,
     error,
     success,
@@ -25,6 +25,7 @@ export function Professores() {
   } = useProfessores();
 
   const [searchValue, setSearchValue] = useState('');
+
   const [showModal, setShowModal] = useState(false);
   const [selectedProfessor, setSelectedProfessor] = useState(null);
 
@@ -36,7 +37,7 @@ export function Professores() {
 
   useEffect(() => {
     fetchProfessores();
-  }, [fetchProfessores]);
+  }, []);
 
   useEffect(() => {
     if (success) {
@@ -44,7 +45,7 @@ export function Professores() {
       setToastType('success');
       clearMessages();
     }
-  }, [success, clearMessages]);
+  }, [success]);
 
   useEffect(() => {
     if (error) {
@@ -52,7 +53,7 @@ export function Professores() {
       setToastType('error');
       clearMessages();
     }
-  }, [error, clearMessages]);
+  }, [error]);
 
   const professoresFiltrados = useMemo(() => {
     if (!searchValue.trim()) return professores;
@@ -111,6 +112,7 @@ export function Professores() {
       searchValue={searchValue}
     >
       <div className="space-y-6">
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -156,6 +158,7 @@ export function Professores() {
           />
         )}
 
+        {/* Modal */}
         <ProfessorModal
           isOpen={showModal}
           professor={selectedProfessor}
@@ -164,6 +167,7 @@ export function Professores() {
           onClose={handleCloseModal}
         />
 
+        {/* Confirmação */}
         <ConfirmModal
           isOpen={showConfirm}
           title="Excluir Professor"
@@ -179,11 +183,15 @@ export function Professores() {
           }}
         />
 
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          onClose={() => setToastMessage('')}
-        />
+        {/* Toast */}
+        {toastMessage && (
+          <Toast
+            message={toastMessage}
+            type={toastType}
+            onClose={() => setToastMessage('')}
+          />
+        )}
+
       </div>
     </Layout>
   );
