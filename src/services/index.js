@@ -1,5 +1,22 @@
-// Serviços de API serão adicionados aqui
-// Exemplo: notebookService, borrowService, etc.
-// Futuramente integraremos com Supabase
+// src/services/index.js
 
-export * from './turmasService';
+/**
+ * Centralizador de todos os services da aplicação.
+ * Basta importar deste arquivo ao invés de importar
+ * cada service individualmente.
+ */
+
+export * from './supabase';
+
+export * from './notebookService';
+export * from './professorService';
+export * from './turmaService';
+
+export * from './emprestimoService';
+export * from './devolucaoService';
+export * from './historicoService';
+
+export * from './dashboardService';
+export * from './relatorioService';
+
+export * from './qrCodeService';

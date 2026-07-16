@@ -1,54 +1,55 @@
+import { useEffect, useMemo, useState } from 'react';
 import {
   Layout,
   EmptyState,
   SearchBar,
   StatusBadge,
+  Loading,
 } from '../../components';
 
 import { Clock } from 'lucide-react';
-import { useState } from 'react';
 import { useEmprestimos } from '../../hooks/useEmprestimos';
-
 
 export function Historico() {
   const [searchValue, setSearchValue] = useState('');
   const [filtro, setFiltro] = useState('todos');
 
   const {
-    emprestimos,
+    emprestimos = [],
     isLoading,
+    fetchEmprestimos,
   } = useEmprestimos();
 
+  useEffect(() => {
+    fetchEmprestimos();
+  }, []);
 
-  const historicoFiltrado = emprestimos.filter((emprestimo) => {
+  const historicoFiltrado = useMemo(() => {
+    const busca = searchValue.toLowerCase().trim();
 
-    const correspondeFiltro =
-      filtro === 'todos' ||
-      (filtro === 'emprestimos' &&
-        emprestimo.status === 'ativo') ||
-      (filtro === 'devolucoes' &&
-        emprestimo.status === 'finalizado');
+    return emprestimos.filter((emprestimo) => {
+      const correspondeFiltro =
+        filtro === 'todos' ||
+        (filtro === 'emprestimos' &&
+          emprestimo.status === 'ativo') ||
+        (filtro === 'devolucoes' &&
+          emprestimo.status === 'finalizado');
 
-
-    const textoBusca =
-      `${emprestimo.notebookId}
-      ${emprestimo.professor}
-      ${emprestimo.turma}`
+      const textoBusca = [
+        emprestimo.notebookId,
+        emprestimo.professor,
+        emprestimo.turma,
+      ]
+        .filter(Boolean)
+        .join(' ')
         .toLowerCase();
 
+      const correspondeBusca =
+        busca === '' || textoBusca.includes(busca);
 
-    const correspondeBusca =
-      textoBusca.includes(
-        searchValue.toLowerCase()
-      );
-
-
-    return (
-      correspondeFiltro &&
-      correspondeBusca
-    );
-  });
-
+      return correspondeFiltro && correspondeBusca;
+    });
+  }, [emprestimos, filtro, searchValue]);
 
   return (
     <Layout
@@ -56,10 +57,7 @@ export function Historico() {
       onSearchChange={setSearchValue}
       searchValue={searchValue}
     >
-
       <div className="space-y-6">
-
-
         {/* Header */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900">
@@ -67,15 +65,12 @@ export function Historico() {
           </h2>
 
           <p className="text-gray-600 mt-1">
-            Visualize todos os empréstimos e devoluções realizados
+            Visualize todos os empréstimos e devoluções realizados.
           </p>
         </div>
 
-
-
         {/* Pesquisa e filtros */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
-
           <SearchBar
             placeholder="Pesquisar por professor, turma ou notebook..."
             value={searchValue}
@@ -84,77 +79,42 @@ export function Historico() {
             }
           />
 
-
           <div className="mt-4 flex flex-wrap gap-2">
-
             {[
               ['todos', 'Todas'],
               ['emprestimos', 'Empréstimos'],
               ['devolucoes', 'Devoluções'],
             ].map(([valor, texto]) => (
-
               <button
                 key={valor}
                 onClick={() => setFiltro(valor)}
-                className={`
-                  px-3 py-1 text-sm rounded-full transition-colors
-                  ${
-                    filtro === valor
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }
-                `}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filtro === valor
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
               >
                 {texto}
               </button>
-
             ))}
-
           </div>
-
         </div>
 
-
-
         {/* Loading */}
-        {isLoading && (
-          <div className="flex justify-center py-10">
-            <p className="text-gray-500">
-              Carregando histórico...
-            </p>
-          </div>
-        )}
-
-
-
-        {/* Sem dados */}
-        {!isLoading &&
-          historicoFiltrado.length === 0 && (
-
+        {isLoading ? (
+          <Loading text="Carregando histórico..." />
+        ) : historicoFiltrado.length === 0 ? (
           <EmptyState
             title="Nenhuma transação encontrada"
             description="O histórico de empréstimos aparecerá aqui."
             icon={Clock}
           />
-
-        )}
-
-
-
-        {/* Tabela */}
-        {!isLoading &&
-          historicoFiltrado.length > 0 && (
-
+        ) : (
           <div className="bg-white rounded-lg border border-gray-200 card-shadow overflow-hidden">
-
             <div className="overflow-x-auto">
-
               <table className="w-full text-sm text-left">
-
                 <thead className="bg-gray-50 border-b border-gray-200">
-
                   <tr>
-
                     <th className="px-6 py-4 font-semibold text-gray-700">
                       Notebook
                     </th>
@@ -178,74 +138,51 @@ export function Historico() {
                     <th className="px-6 py-4 font-semibold text-gray-700">
                       Status
                     </th>
-
                   </tr>
-
                 </thead>
 
-
                 <tbody>
-
                   {historicoFiltrado.map((emprestimo) => (
-
                     <tr
                       key={emprestimo.id}
-                      className="border-b border-gray-100 hover:bg-gray-50"
+                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                     >
-
                       <td className="px-6 py-4 font-medium text-gray-900">
                         {emprestimo.notebookId}
                       </td>
-
 
                       <td className="px-6 py-4 text-gray-700">
                         {emprestimo.professor}
                       </td>
 
-
                       <td className="px-6 py-4 text-gray-700">
                         {emprestimo.turma}
                       </td>
 
-
                       <td className="px-6 py-4 text-gray-600">
-                        {emprestimo.dataEmprestimo}
-                        {' '}
+                        {emprestimo.dataEmprestimo}{' '}
                         {emprestimo.horaEmprestimo}
                       </td>
-
 
                       <td className="px-6 py-4 text-gray-600">
                         {emprestimo.dataDevolucao
                           ? `${emprestimo.dataDevolucao} ${emprestimo.horaDevolucao || ''}`
-                          : '-'
-                        }
+                          : '-'}
                       </td>
-
 
                       <td className="px-6 py-4">
                         <StatusBadge
                           status={emprestimo.status}
                         />
                       </td>
-
-
                     </tr>
-
                   ))}
-
                 </tbody>
-
               </table>
-
             </div>
-
           </div>
-
         )}
-
       </div>
-
     </Layout>
   );
 }

@@ -37,7 +37,7 @@ export function Professores() {
 
   useEffect(() => {
     fetchProfessores();
-  }, []);
+  }, [fetchProfessores]);
 
   useEffect(() => {
     if (success) {
@@ -45,7 +45,7 @@ export function Professores() {
       setToastType('success');
       clearMessages();
     }
-  }, [success]);
+  }, [success, clearMessages]);
 
   useEffect(() => {
     if (error) {
@@ -53,7 +53,7 @@ export function Professores() {
       setToastType('error');
       clearMessages();
     }
-  }, [error]);
+  }, [error, clearMessages]);
 
   const professoresFiltrados = useMemo(() => {
     if (!searchValue.trim()) return professores;
@@ -82,13 +82,17 @@ export function Professores() {
   };
 
   const handleSave = async (data) => {
-    if (selectedProfessor) {
-      await handleUpdate(selectedProfessor.id, data);
-    } else {
-      await handleCreate(data);
-    }
+    try {
+      if (selectedProfessor) {
+        await handleUpdate(selectedProfessor.id, data);
+      } else {
+        await handleCreate(data);
+      }
 
-    handleCloseModal();
+      handleCloseModal();
+    } catch {
+      // O hook já trata o erro e exibe o Toast
+    }
   };
 
   const handleOpenDelete = (professor) => {
@@ -99,10 +103,14 @@ export function Professores() {
   const handleConfirmDelete = async () => {
     if (!professorDelete) return;
 
-    await handleDelete(professorDelete.id);
+    try {
+      await handleDelete(professorDelete.id);
 
-    setProfessorDelete(null);
-    setShowConfirm(false);
+      setProfessorDelete(null);
+      setShowConfirm(false);
+    } catch {
+      // O hook já trata o erro e exibe o Toast
+    }
   };
 
   return (

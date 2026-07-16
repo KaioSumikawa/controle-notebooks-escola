@@ -1,121 +1,132 @@
-import { Layout, DashboardCard } from '../../components';
-import { BarChart3, PieChart, TrendingUp, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import {
+  Layout,
+  DashboardCard,
+} from '../../components';
+
+import {
+  BarChart3,
+  Laptop,
+  CheckCircle2,
+  AlertTriangle,
+  Calendar,
+} from 'lucide-react';
 
 export function Relatorios() {
   const [dateRange, setDateRange] = useState('month');
 
+  const filtros = [
+    ['week', 'Última Semana'],
+    ['month', 'Este Mês'],
+    ['year', 'Este Ano'],
+    ['all', 'Todo o Período'],
+  ];
+
   return (
-    <Layout title="Relatórios e Análises">
+    <Layout title="Relatórios">
       <div className="space-y-6">
-        {/* Header Section */}
+
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Relatórios</h2>
-            <p className="text-gray-600 mt-1">Analise dados e gere relatórios personalizados</p>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Relatórios
+            </h2>
+
+            <p className="text-gray-600 mt-1">
+              Acompanhe indicadores e estatísticas do sistema.
+            </p>
           </div>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
             <Calendar size={18} />
-            Exportar
+            Exportar Relatório
           </button>
         </div>
 
-        {/* Date Range Selector */}
+        {/* Filtros */}
         <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
           <div className="flex flex-wrap gap-2">
-            <button 
-              onClick={() => setDateRange('week')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                dateRange === 'week'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Última Semana
-            </button>
-            <button 
-              onClick={() => setDateRange('month')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                dateRange === 'month'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Este Mês
-            </button>
-            <button 
-              onClick={() => setDateRange('year')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                dateRange === 'year'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Este Ano
-            </button>
-            <button 
-              onClick={() => setDateRange('all')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                dateRange === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Tudo
-            </button>
+            {filtros.map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setDateRange(value)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  dateRange === value
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
           <DashboardCard
-            title="Total de Empréstimos"
-            value="256"
+            title="Empréstimos"
+            value="0"
             icon={BarChart3}
             variant="primary"
-            trend={8}
           />
+
           <DashboardCard
-            title="Taxa de Devolução"
-            value="98.5%"
-            icon={TrendingUp}
+            title="Notebooks Disponíveis"
+            value="0"
+            icon={Laptop}
             variant="success"
-            trend={2}
           />
+
           <DashboardCard
-            title="Notebooks Danificados"
-            value="2"
-            icon={PieChart}
-            variant="danger"
-            trend={-1}
-          />
-          <DashboardCard
-            title="Satisfação"
-            value="4.8/5"
-            icon={TrendingUp}
+            title="Devoluções"
+            value="0"
+            icon={CheckCircle2}
             variant="warning"
-            trend={5}
           />
+
+          <DashboardCard
+            title="Em Manutenção"
+            value="0"
+            icon={AlertTriangle}
+            variant="danger"
+          />
+
         </div>
 
-        {/* Reports Section */}
+        {/* Gráficos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Chart Placeholder 1 */}
+
           <div className="bg-white rounded-lg border border-gray-200 p-6 card-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Empréstimos por Período</h3>
-            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-              <p className="text-gray-500">Gráfico será implementado aqui</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Empréstimos por Período
+            </h3>
+
+            <div className="h-72 flex items-center justify-center rounded-lg bg-gray-50 border border-dashed border-gray-300">
+              <p className="text-gray-500">
+                Gráfico em desenvolvimento
+              </p>
             </div>
           </div>
 
-          {/* Chart Placeholder 2 */}
           <div className="bg-white rounded-lg border border-gray-200 p-6 card-shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Distribuição de Status</h3>
-            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-              <p className="text-gray-500">Gráfico será implementado aqui</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Situação dos Notebooks
+            </h3>
+
+            <div className="h-72 flex items-center justify-center rounded-lg bg-gray-50 border border-dashed border-gray-300">
+              <p className="text-gray-500">
+                Gráfico em desenvolvimento
+              </p>
             </div>
           </div>
+
         </div>
+
       </div>
     </Layout>
   );

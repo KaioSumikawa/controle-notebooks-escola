@@ -12,24 +12,18 @@ export function useProfessores() {
     setSuccess('');
   };
 
-
   const fetchProfessores = async () => {
     setIsLoading(true);
 
     try {
       // Futuramente será substituído pelo Supabase
       setProfessores((prev) => [...prev]);
-
     } catch (err) {
-      setError(
-        err?.message || 'Erro ao carregar professores.'
-      );
-
+      setError(err?.message || 'Erro ao carregar professores.');
     } finally {
       setIsLoading(false);
     }
   };
-
 
   const handleCreate = async (data) => {
     setIsLoading(true);
@@ -38,54 +32,37 @@ export function useProfessores() {
       let novoProfessor;
 
       setProfessores((prev) => {
+        const numero = prev.length + 1;
 
         novoProfessor = {
-          id: `PROF-${String(prev.length + 1).padStart(3, '0')}`,
+          id: `PROF-${String(numero).padStart(3, '0')}`,
           nome: data.nome,
-          email: data.email || '',
-          telefone: data.telefone || '',
-          disciplina: data.disciplina || '',
+          matricula: data.matricula ?? '',
+          email: data.email ?? '',
+          telefone: data.telefone ?? '',
+          disciplina: data.disciplina ?? '',
           ativo: true,
           createdAt: new Date().toISOString(),
         };
 
-
-        return [
-          ...prev,
-          novoProfessor,
-        ];
+        return [...prev, novoProfessor];
       });
 
-
-      setSuccess(
-        'Professor cadastrado com sucesso.'
-      );
-
+      setSuccess('Professor cadastrado com sucesso.');
 
       return novoProfessor;
-
     } catch (err) {
-
-      setError(
-        err?.message || 'Erro ao cadastrar professor.'
-      );
-
+      setError(err?.message || 'Erro ao cadastrar professor.');
       throw err;
-
     } finally {
-
       setIsLoading(false);
-
     }
   };
-
-
 
   const handleUpdate = async (id, data) => {
     setIsLoading(true);
 
     try {
-
       setProfessores((prev) =>
         prev.map((professor) =>
           professor.id === id
@@ -97,81 +74,41 @@ export function useProfessores() {
         )
       );
 
-
-      setSuccess(
-        'Professor atualizado com sucesso.'
-      );
-
-
+      setSuccess('Professor atualizado com sucesso.');
     } catch (err) {
-
-      setError(
-        err?.message || 'Erro ao atualizar professor.'
-      );
-
+      setError(err?.message || 'Erro ao atualizar professor.');
       throw err;
-
     } finally {
-
       setIsLoading(false);
-
     }
   };
-
-
 
   const handleDelete = async (id) => {
     setIsLoading(true);
 
     try {
-
       setProfessores((prev) =>
-        prev.filter(
-          (professor) =>
-            professor.id !== id
-        )
+        prev.filter((professor) => professor.id !== id)
       );
 
-
-      setSuccess(
-        'Professor removido com sucesso.'
-      );
-
-
+      setSuccess('Professor removido com sucesso.');
     } catch (err) {
-
-      setError(
-        err?.message || 'Erro ao remover professor.'
-      );
-
+      setError(err?.message || 'Erro ao remover professor.');
       throw err;
-
     } finally {
-
       setIsLoading(false);
-
     }
   };
 
-
-
   return {
     professores,
-
     isLoading,
-
     error,
-
     success,
-
     fetchProfessores,
-
     handleCreate,
-
     handleUpdate,
-
     handleDelete,
-
     clearMessages,
   };
 }

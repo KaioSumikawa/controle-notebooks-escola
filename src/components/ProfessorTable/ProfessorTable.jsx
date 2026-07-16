@@ -1,8 +1,9 @@
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 export function ProfessorTable({
   professores = [],
   onEdit,
+  onDelete,
 }) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 card-shadow overflow-hidden">
@@ -37,48 +38,7 @@ export function ProfessorTable({
           </thead>
 
           <tbody>
-            {professores.map((professor) => (
-              <tr
-                key={professor.id}
-                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-              >
-                <td className="px-6 py-4 font-medium text-gray-900">
-                  {professor.nome}
-                </td>
-
-                <td className="px-6 py-4 text-gray-700">
-                  {professor.matricula || '-'}
-                </td>
-
-                <td className="px-6 py-4 text-gray-700">
-                  {professor.email || '-'}
-                </td>
-
-                <td className="px-6 py-4 text-gray-700">
-                  {professor.telefone || '-'}
-                </td>
-
-                <td className="px-6 py-4 text-gray-700">
-                  {professor.disciplina || '-'}
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => onEdit?.(professor)}
-                      className="flex items-center gap-2 px-3 py-2 text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
-                      title="Editar professor"
-                    >
-                      <Pencil size={16} />
-                      Editar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-
-            {professores.length === 0 && (
+            {professores.length === 0 ? (
               <tr>
                 <td
                   colSpan={6}
@@ -87,6 +47,57 @@ export function ProfessorTable({
                   Nenhum professor encontrado.
                 </td>
               </tr>
+            ) : (
+              professores.map((professor) => (
+                <tr
+                  key={professor.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-6 py-4 font-medium text-gray-900">
+                    {professor.nome}
+                  </td>
+
+                  <td className="px-6 py-4 text-gray-700">
+                    {professor.matricula ?? '-'}
+                  </td>
+
+                  <td className="px-6 py-4 text-gray-700">
+                    {professor.email ?? '-'}
+                  </td>
+
+                  <td className="px-6 py-4 text-gray-700">
+                    {professor.telefone ?? '-'}
+                  </td>
+
+                  <td className="px-6 py-4 text-gray-700">
+                    {professor.disciplina ?? '-'}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onEdit?.(professor)}
+                        className="flex items-center gap-2 px-3 py-2 text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
+                        title="Editar professor"
+                      >
+                        <Pencil size={16} />
+                        Editar
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => onDelete?.(professor)}
+                        className="flex items-center gap-2 px-3 py-2 text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors"
+                        title="Excluir professor"
+                      >
+                        <Trash2 size={16} />
+                        Excluir
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>

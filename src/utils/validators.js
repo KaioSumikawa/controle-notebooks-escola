@@ -1,276 +1,366 @@
 /**
- * Validadores de dados
- * Funções reutilizáveis para validação em toda a aplicação
+ * Validações reutilizáveis da aplicação
  */
 
-import { VALIDATION_RULES, MESSAGES } from './constants.js';
+const EMAIL_PATTERN =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/**
- * Valida se um campo é obrigatório
- * @param {string} value - Valor a validar
- * @param {string} fieldName - Nome do campo (para mensagem)
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateRequired = (value, fieldName = 'Campo') => {
-  if (!value || (typeof value === 'string' && value.trim() === '')) {
+const PHONE_PATTERN =
+  /^(\+55\s?)?(\(?\d{2}\)?\s?)?\d{4,5}-?\d{4}$/;
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export const validateRequired = (
+  value,
+  fieldName = 'Campo'
+) => {
+  if (
+    value === null ||
+    value === undefined ||
+    (typeof value === 'string' &&
+      value.trim() === '')
+  ) {
     return {
       isValid: false,
-      error: `${fieldName} é obrigatório`,
+      error: `${fieldName} é obrigatório.`,
     };
   }
-  return { isValid: true, error: null };
+
+  return {
+    isValid: true,
+    error: null,
+  };
 };
 
-/**
- * Valida comprimento mínimo de string
- * @param {string} value - Valor a validar
- * @param {number} minLength - Comprimento mínimo
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateMinLength = (value, minLength = 2) => {
-  if (value && value.length < minLength) {
+export const validateMinLength = (
+  value,
+  minLength = 2
+) => {
+  if (
+    value &&
+    value.trim().length < minLength
+  ) {
     return {
       isValid: false,
-      error: `Mínimo de ${minLength} caracteres`,
+      error: `Mínimo de ${minLength} caracteres.`,
     };
   }
-  return { isValid: true, error: null };
+
+  return {
+    isValid: true,
+    error: null,
+  };
 };
 
-/**
- * Valida comprimento máximo de string
- * @param {string} value - Valor a validar
- * @param {number} maxLength - Comprimento máximo
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateMaxLength = (value, maxLength = 100) => {
-  if (value && value.length > maxLength) {
+export const validateMaxLength = (
+  value,
+  maxLength = 100
+) => {
+  if (
+    value &&
+    value.trim().length > maxLength
+  ) {
     return {
       isValid: false,
-      error: `Máximo de ${maxLength} caracteres`,
+      error: `Máximo de ${maxLength} caracteres.`,
     };
   }
-  return { isValid: true, error: null };
+
+  return {
+    isValid: true,
+    error: null,
+  };
 };
 
-/**
- * Valida formato de e-mail
- * @param {string} email - E-mail a validar
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateEmail = (email) => {
-  if (!email) {
-    return { isValid: false, error: 'E-mail é obrigatório' };
+export const validateEmail = (
+  email
+) => {
+  const required =
+    validateRequired(email, 'E-mail');
+
+  if (!required.isValid) {
+    return required;
   }
 
-  if (!VALIDATION_RULES.EMAIL_PATTERN.test(email)) {
-    return { isValid: false, error: 'E-mail inválido' };
+  if (!EMAIL_PATTERN.test(email)) {
+    return {
+      isValid: false,
+      error: 'E-mail inválido.',
+    };
   }
 
-  return { isValid: true, error: null };
+  return {
+    isValid: true,
+    error: null,
+  };
 };
 
-/**
- * Valida formato de telefone
- * @param {string} phone - Telefone a validar
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validatePhone = (phone) => {
+export const validatePhone = (
+  phone
+) => {
   if (!phone) {
-    return { isValid: true, error: null }; // Opcional
-  }
-
-  if (!VALIDATION_RULES.PHONE_PATTERN.test(phone)) {
-    return { isValid: false, error: 'Telefone inválido' };
-  }
-
-  return { isValid: true, error: null };
-};
-
-/**
- * Valida nome (texto básico)
- * @param {string} name - Nome a validar
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateName = (name) => {
-  const required = validateRequired(name, 'Nome');
-  if (!required.isValid) return required;
-
-  const minLength = validateMinLength(name, VALIDATION_RULES.NAME_MIN_LENGTH);
-  if (!minLength.isValid) return minLength;
-
-  const maxLength = validateMaxLength(name, VALIDATION_RULES.NAME_MAX_LENGTH);
-  if (!maxLength.isValid) return maxLength;
-
-  return { isValid: true, error: null };
-};
-
-/**
- * Valida múltiplos campos
- * @param {object} data - Dados a validar { fieldName: value }
- * @param {object} rules - Regras de validação { fieldName: validatorFunctions }
- * @returns {object} { isValid: boolean, errors: object }
- */
-export const validateMultiple = (data, rules) => {
-  const errors = {};
-  let isValid = true;
-
-  Object.entries(rules).forEach(([fieldName, validators]) => {
-    const value = data[fieldName];
-
-    // Se validators é uma função, executa
-    if (typeof validators === 'function') {
-      const result = validators(value);
-      if (!result.isValid) {
-        errors[fieldName] = result.error;
-        isValid = false;
-      }
-    }
-    // Se validators é um array, executa todas
-    else if (Array.isArray(validators)) {
-      for (const validator of validators) {
-        const result = validator(value);
-        if (!result.isValid) {
-          errors[fieldName] = result.error;
-          isValid = false;
-          break; // Para no primeiro erro
-        }
-      }
-    }
-  });
-
-  return { isValid, errors };
-};
-
-/**
- * Valida se é um UUID válido
- * @param {string} uuid - UUID a validar
- * @returns {boolean}
- */
-export const validateUUID = (uuid) => {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(uuid);
-};
-
-/**
- * Valida se é um número
- * @param {any} value - Valor a validar
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateNumber = (value) => {
-  if (value === null || value === undefined || value === '') {
-    return { isValid: false, error: 'Campo obrigatório' };
-  }
-
-  if (isNaN(value) || !Number.isFinite(value)) {
-    return { isValid: false, error: 'Deve ser um número válido' };
-  }
-
-  return { isValid: true, error: null };
-};
-
-/**
- * Valida se é um inteiro positivo
- * @param {any} value - Valor a validar
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validatePositiveInteger = (value) => {
-  const numberValidation = validateNumber(value);
-  if (!numberValidation.isValid) return numberValidation;
-
-  if (!Number.isInteger(value) || value <= 0) {
-    return { isValid: false, error: 'Deve ser um inteiro positivo' };
-  }
-
-  return { isValid: true, error: null };
-};
-
-/**
- * Valida data
- * @param {string|Date} date - Data a validar
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateDate = (date) => {
-  if (!date) {
-    return { isValid: false, error: 'Data é obrigatória' };
-  }
-
-  const dateObj = new Date(date);
-  if (isNaN(dateObj.getTime())) {
-    return { isValid: false, error: 'Data inválida' };
-  }
-
-  return { isValid: true, error: null };
-};
-
-/**
- * Valida se data é após outra
- * @param {string|Date} dateToValidate - Data a validar
- * @param {string|Date} minDate - Data mínima
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateDateAfter = (dateToValidate, minDate) => {
-  const dateValidation = validateDate(dateToValidate);
-  if (!dateValidation.isValid) return dateValidation;
-
-  const date1 = new Date(dateToValidate);
-  const date2 = new Date(minDate);
-
-  if (date1 <= date2) {
     return {
-      isValid: false,
-      error: 'A data deve ser após a data inicial',
+      isValid: true,
+      error: null,
     };
   }
 
-  return { isValid: true, error: null };
+  if (!PHONE_PATTERN.test(phone)) {
+    return {
+      isValid: false,
+      error: 'Telefone inválido.',
+    };
+  }
+
+  return {
+    isValid: true,
+    error: null,
+  };
 };
 
-/**
- * Valida arquivo
- * @param {File} file - Arquivo a validar
- * @param {object} options - Opções { maxSize, allowedTypes }
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validateFile = (file, options = {}) => {
-  const { maxSize = 5 * 1024 * 1024, allowedTypes = [] } = options;
+export const validateName = (
+  name
+) => {
+  const required =
+    validateRequired(name, 'Nome');
+
+  if (!required.isValid) {
+    return required;
+  }
+
+  const min =
+    validateMinLength(name, 2);
+
+  if (!min.isValid) {
+    return min;
+  }
+
+  const max =
+    validateMaxLength(name, 100);
+
+  if (!max.isValid) {
+    return max;
+  }
+
+  return {
+    isValid: true,
+    error: null,
+  };
+};
+
+export const validateNumber = (
+  value
+) => {
+  if (
+    value === '' ||
+    value === null ||
+    value === undefined
+  ) {
+    return {
+      isValid: false,
+      error: 'Campo obrigatório.',
+    };
+  }
+
+  const number = Number(value);
+
+  if (Number.isNaN(number)) {
+    return {
+      isValid: false,
+      error: 'Número inválido.',
+    };
+  }
+
+  return {
+    isValid: true,
+    error: null,
+  };
+};
+
+export const validatePositiveInteger = (
+  value
+) => {
+  const result =
+    validateNumber(value);
+
+  if (!result.isValid) {
+    return result;
+  }
+
+  const number = Number(value);
+
+  if (
+    !Number.isInteger(number) ||
+    number <= 0
+  ) {
+    return {
+      isValid: false,
+      error:
+        'Informe um número inteiro positivo.',
+    };
+  }
+
+  return {
+    isValid: true,
+    error: null,
+  };
+};
+
+export const validateDate = (
+  date
+) => {
+  if (!date) {
+    return {
+      isValid: false,
+      error: 'Data obrigatória.',
+    };
+  }
+
+  const d = new Date(date);
+
+  if (Number.isNaN(d.getTime())) {
+    return {
+      isValid: false,
+      error: 'Data inválida.',
+    };
+  }
+
+  return {
+    isValid: true,
+    error: null,
+  };
+};
+
+export const validateDateAfter = (
+  currentDate,
+  minDate
+) => {
+  const validation =
+    validateDate(currentDate);
+
+  if (!validation.isValid) {
+    return validation;
+  }
+
+  if (
+    new Date(currentDate) <=
+    new Date(minDate)
+  ) {
+    return {
+      isValid: false,
+      error:
+        'A data deve ser posterior.',
+    };
+  }
+
+  return {
+    isValid: true,
+    error: null,
+  };
+};
+
+export const validateUUID = (
+  uuid
+) => {
+  return UUID_PATTERN.test(uuid);
+};
+
+export const validatePattern = (
+  value,
+  pattern,
+  errorMessage = 'Formato inválido.'
+) => {
+  const required =
+    validateRequired(value);
+
+  if (!required.isValid) {
+    return required;
+  }
+
+  if (!pattern.test(value)) {
+    return {
+      isValid: false,
+      error: errorMessage,
+    };
+  }
+
+  return {
+    isValid: true,
+    error: null,
+  };
+};
+
+export const validateFile = (
+  file,
+  options = {}
+) => {
+  const {
+    maxSize = 5 * 1024 * 1024,
+    allowedTypes = [],
+  } = options;
 
   if (!file) {
-    return { isValid: false, error: 'Arquivo é obrigatório' };
+    return {
+      isValid: false,
+      error: 'Selecione um arquivo.',
+    };
   }
 
   if (file.size > maxSize) {
     return {
       isValid: false,
-      error: `Arquivo muito grande (máximo ${(maxSize / 1024 / 1024).toFixed(2)}MB)`,
+      error: `Arquivo maior que ${(maxSize / 1024 / 1024).toFixed(1)} MB.`,
     };
   }
 
-  if (allowedTypes.length > 0 && !allowedTypes.includes(file.type)) {
+  if (
+    allowedTypes.length &&
+    !allowedTypes.includes(file.type)
+  ) {
     return {
       isValid: false,
-      error: `Tipo de arquivo não permitido. Tipos aceitos: ${allowedTypes.join(', ')}`,
+      error:
+        'Tipo de arquivo não permitido.',
     };
   }
 
-  return { isValid: true, error: null };
+  return {
+    isValid: true,
+    error: null,
+  };
 };
 
-/**
- * Valida padrão customizado com regex
- * @param {string} value - Valor a validar
- * @param {RegExp} pattern - Padrão regex
- * @param {string} errorMessage - Mensagem de erro customizada
- * @returns {object} { isValid: boolean, error: string }
- */
-export const validatePattern = (value, pattern, errorMessage = 'Formato inválido') => {
-  if (!value) {
-    return { isValid: false, error: 'Campo obrigatório' };
-  }
+export const validateMultiple = (
+  data,
+  rules
+) => {
+  const errors = {};
 
-  if (!pattern.test(value)) {
-    return { isValid: false, error: errorMessage };
-  }
+  Object.entries(rules).forEach(
+    ([field, validators]) => {
+      const lista = Array.isArray(
+        validators
+      )
+        ? validators
+        : [validators];
 
-  return { isValid: true, error: null };
+      for (const validator of lista) {
+        const result = validator(
+          data[field]
+        );
+
+        if (!result.isValid) {
+          errors[field] = result.error;
+          break;
+        }
+      }
+    }
+  );
+
+  return {
+    isValid:
+      Object.keys(errors).length === 0,
+    errors,
+  };
 };

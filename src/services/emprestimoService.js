@@ -9,13 +9,19 @@ export const emprestimoService = {
   async getAll() {
     try {
       return [...emprestimos].sort((a, b) => {
-        const dataA = new Date(`${a.dataEmprestimo} ${a.horaEmprestimo}`);
-        const dataB = new Date(`${b.dataEmprestimo} ${b.horaEmprestimo}`);
+        const dataA = new Date(
+          `${a.dataEmprestimo} ${a.horaEmprestimo || '00:00'}`
+        );
+
+        const dataB = new Date(
+          `${b.dataEmprestimo} ${b.horaEmprestimo || '00:00'}`
+        );
+
         return dataB - dataA;
       });
     } catch (error) {
       console.error('Erro ao buscar empréstimos:', error);
-      throw new Error('Erro ao buscar empréstimos.');
+      return [];
     }
   },
 
@@ -25,11 +31,13 @@ export const emprestimoService = {
   async getById(id) {
     try {
       return (
-        emprestimos.find((emprestimo) => emprestimo.id === id) || null
+        emprestimos.find(
+          (emprestimo) => emprestimo.id === id
+        ) || null
       );
     } catch (error) {
       console.error('Erro ao buscar empréstimo:', error);
-      throw new Error('Erro ao buscar empréstimo.');
+      return null;
     }
   },
 
@@ -38,7 +46,7 @@ export const emprestimoService = {
    */
   async create(data) {
     try {
-      if (!data.notebook) {
+      if (!data.notebook?.trim?.() && !data.notebook) {
         throw new Error('Selecione um notebook.');
       }
 
@@ -53,29 +61,22 @@ export const emprestimoService = {
       const agora = new Date();
 
       const novoEmprestimo = {
-        id: Date.now().toString(),
-
+        id: `EMP-${Date.now()}`,
         notebookId: data.notebook,
-
         professor: data.professor.trim(),
-
         turma: data.turma.trim(),
-
         dataEmprestimo:
-          data.dataEmprestimo || agora.toISOString().split('T')[0],
-
+          data.dataEmprestimo ||
+          agora.toISOString().split('T')[0],
         horaEmprestimo: agora.toLocaleTimeString('pt-BR', {
           hour: '2-digit',
           minute: '2-digit',
         }),
-
         dataDevolucao: null,
-
         horaDevolucao: null,
-
         status: 'ativo',
-
         observacao: data.observacao?.trim() || '',
+        createdAt: agora.toISOString(),
       };
 
       emprestimos.unshift(novoEmprestimo);
@@ -113,7 +114,7 @@ export const emprestimoService = {
   },
 
   /**
-   * Registra a devolução
+   * Registrar devolução
    */
   async devolver(id) {
     try {
@@ -123,6 +124,12 @@ export const emprestimoService = {
 
       if (index === -1) {
         throw new Error('Empréstimo não encontrado.');
+      }
+
+      if (emprestimos[index].status === 'finalizado') {
+        throw new Error(
+          'Este empréstimo já foi devolvido.'
+        );
       }
 
       const agora = new Date();
@@ -135,11 +142,15 @@ export const emprestimoService = {
           hour: '2-digit',
           minute: '2-digit',
         }),
+        updatedAt: agora.toISOString(),
       };
 
       return emprestimos[index];
     } catch (error) {
-      console.error('Erro ao registrar devolução:', error);
+      console.error(
+        'Erro ao registrar devolução:',
+        error
+      );
       throw error;
     }
   },
@@ -172,22 +183,52 @@ export const emprestimoService = {
    * Empréstimos ativos
    */
   async getAtivos() {
-    return emprestimos.filter(
-      (emprestimo) => emprestimo.status === 'ativo'
-    );
+    try {
+      return emprestimos.filter(
+        (emprestimo) => emprestimo.status === 'ativo'
+      );
+    } catch (error) {
+      console.error(
+        'Erro ao buscar empréstimos ativos:',
+        error
+      );
+      return [];
+    }
   },
 
   /**
-   * Histórico (finalizados)
+   * Histórico de empréstimos
    */
   async getHistorico() {
-    return emprestimos.filter(
-      (emprestimo) => emprestimo.status === 'finalizado'
-    );
+    try {
+      return emprestimos.filter(
+        (emprestimo) => emprestimo.status === 'finalizado'
+      );
+    } catch (error) {
+      console.error(
+        'Erro ao buscar histórico:',
+        error
+      );
+      return [];
+    }
   },
 
   /**
-   * Restaura os dados iniciais
+   * Estatísticas
+   */
+  async getEstatisticas() {
+    const ativos = await this.getAtivos();
+    const historico = await this.getHistorico();
+
+    return {
+      total: emprestimos.length,
+      ativos: ativos.length,
+      finalizados: historico.length,
+    };
+  },
+
+  /**
+   * Resetar dados (modo desenvolvimento)
    */
   async reset() {
     emprestimos = [...emprestimosIniciais];

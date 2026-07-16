@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { historicoService } from '../services/historicoService';
 
 export function useHistorico() {
@@ -12,16 +12,13 @@ export function useHistorico() {
     setSuccess('');
   }, []);
 
-
-  // Buscar histórico
   const fetchHistorico = useCallback(async () => {
     setIsLoading(true);
     setError('');
 
     try {
       const data = await historicoService.getAll();
-
-      setHistorico(data);
+      setHistorico(data || []);
     } catch (err) {
       setError(
         err?.message || 'Erro ao carregar histórico.'
@@ -31,15 +28,14 @@ export function useHistorico() {
     }
   }, []);
 
-
-  // Criar registro no histórico
   const handleCreate = useCallback(async (data) => {
     setIsLoading(true);
     setError('');
     setSuccess('');
 
     try {
-      const novoRegistro = await historicoService.create(data);
+      const novoRegistro =
+        await historicoService.create(data);
 
       setHistorico((prev) => [
         novoRegistro,
@@ -51,21 +47,17 @@ export function useHistorico() {
       );
 
       return novoRegistro;
-
     } catch (err) {
       setError(
         err?.message || 'Erro ao criar registro.'
       );
 
       throw err;
-
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-
-  // Atualizar registro
   const handleUpdate = useCallback(async (id, data) => {
     setIsLoading(true);
     setError('');
@@ -75,7 +67,6 @@ export function useHistorico() {
       const registroAtualizado =
         await historicoService.update(id, data);
 
-
       setHistorico((prev) =>
         prev.map((item) =>
           item.id === id
@@ -84,28 +75,22 @@ export function useHistorico() {
         )
       );
 
-
       setSuccess(
         'Histórico atualizado com sucesso.'
       );
 
-
       return registroAtualizado;
-
     } catch (err) {
       setError(
         err?.message || 'Erro ao atualizar histórico.'
       );
 
       throw err;
-
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-
-  // Remover registro
   const handleDelete = useCallback(async (id) => {
     setIsLoading(true);
     setError('');
@@ -114,30 +99,27 @@ export function useHistorico() {
     try {
       await historicoService.delete(id);
 
-
       setHistorico((prev) =>
-        prev.filter(
-          (item) => item.id !== id
-        )
+        prev.filter((item) => item.id !== id)
       );
-
 
       setSuccess(
         'Registro removido do histórico.'
       );
-
     } catch (err) {
       setError(
         err?.message || 'Erro ao remover registro.'
       );
 
       throw err;
-
     } finally {
       setIsLoading(false);
     }
   }, []);
 
+  useEffect(() => {
+    fetchHistorico();
+  }, [fetchHistorico]);
 
   return {
     historico,

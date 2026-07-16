@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Modal } from './Modal';
+import { QrCode } from 'lucide-react';
+import { qrCodeService } from '../../services/qrCodeService';
 
 const createInitialFormData = () => ({
   modelo: '',
@@ -7,6 +9,7 @@ const createInitialFormData = () => ({
   localizacao: '',
   status: 'disponivel',
   observacao: '',
+  qrCode: '',
 });
 
 /**
@@ -32,6 +35,7 @@ export function NotebookModal({
         localizacao: notebook.localizacao ?? '',
         status: notebook.status ?? 'disponivel',
         observacao: notebook.observacao ?? '',
+        qrCode: notebook.qrCode ?? notebook.id ?? '',
       });
     } else {
       setFormData(createInitialFormData());
@@ -54,6 +58,23 @@ export function NotebookModal({
     }));
   };
 
+  const handleGenerateQrCode = async () => {
+    try {
+      const qr = await qrCodeService.generate({
+        id: notebook?.id,
+        numero: notebook?.numero,
+        qrCode: formData.qrCode,
+      });
+
+      setFormData((prev) => ({
+        ...prev,
+        qrCode: qr.codigo,
+      }));
+    } catch (err) {
+      setError(err.message || 'Erro ao gerar QR Code.');
+    }
+  };
+
   const handleClose = () => {
     if (isLoading) return;
 
@@ -72,6 +93,7 @@ export function NotebookModal({
       localizacao: formData.localizacao.trim(),
       status: formData.status,
       observacao: formData.observacao.trim(),
+      qrCode: formData.qrCode,
     };
 
     if (!dados.modelo) {
@@ -95,6 +117,7 @@ export function NotebookModal({
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+
         {/* Modelo */}
         <div>
           <label
@@ -153,7 +176,7 @@ export function NotebookModal({
             value={formData.localizacao}
             onChange={handleChange}
             disabled={isLoading}
-            placeholder="Ex: Laboratório de Informática"
+            placeholder="Ex: Sala dos Professores"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -181,6 +204,33 @@ export function NotebookModal({
           </select>
         </div>
 
+        {/* QR Code */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            QR Code
+          </label>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={formData.qrCode}
+              readOnly
+              placeholder="Ainda não gerado"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
+            />
+
+            <button
+              type="button"
+              onClick={handleGenerateQrCode}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
+            >
+              <QrCode size={18} />
+              Gerar
+            </button>
+          </div>
+        </div>
+
         {/* Observação */}
         <div>
           <label
@@ -197,12 +247,11 @@ export function NotebookModal({
             value={formData.observacao}
             onChange={handleChange}
             disabled={isLoading}
-            placeholder="Ex: Tela com risco, carregador faltando..."
+            placeholder="Ex: Tela com risco..."
             className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* Mensagem de erro */}
         {error && (
           <div className="p-3 rounded-lg border border-red-200 bg-red-50">
             <p className="text-sm text-red-700">
@@ -211,7 +260,6 @@ export function NotebookModal({
           </div>
         )}
 
-        {/* Botões */}
         <div className="flex gap-3 pt-4">
           <button
             type="button"
@@ -230,8 +278,8 @@ export function NotebookModal({
             {isLoading
               ? 'Salvando...'
               : notebook
-              ? 'Atualizar'
-              : 'Cadastrar'}
+                ? 'Atualizar'
+                : 'Cadastrar'}
           </button>
         </div>
       </form>

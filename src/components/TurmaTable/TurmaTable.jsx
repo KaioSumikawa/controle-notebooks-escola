@@ -6,178 +6,87 @@ export function TurmaTable({
   onEdit,
   onDelete,
 }) {
+  if (turmas.length === 0) {
+    return (
+      <div className="bg-white rounded-lg border border-gray-200 card-shadow p-8 text-center">
+        <p className="text-gray-500">
+          Nenhuma turma encontrada.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 card-shadow overflow-hidden">
-
       <div className="overflow-x-auto">
-
         <table className="w-full text-sm text-left">
-
           <thead className="bg-gray-50 border-b border-gray-200">
-
             <tr>
-
               <th className="px-6 py-4 font-semibold text-gray-700">
                 Nome da Turma
               </th>
-
 
               <th className="px-6 py-4 font-semibold text-gray-700">
                 Criada em
               </th>
 
-
               <th className="px-6 py-4 font-semibold text-gray-700 text-center">
                 Ações
               </th>
-
             </tr>
-
           </thead>
 
-
-
           <tbody>
+            {turmas.map((turma) => {
+              const dataCriacao =
+                turma.created_at || turma.createdAt;
 
-            {turmas.map((turma) => (
-
-              <tr
-
-                key={turma.id}
-
-                className="
-                  border-b
-                  border-gray-100
-                  hover:bg-gray-50
-                  transition-colors
-                "
-
-              >
-
-
-                <td className="px-6 py-4">
-
-                  <p className="font-medium text-gray-900">
+              return (
+                <tr
+                  key={turma.id}
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-6 py-4 font-medium text-gray-900">
                     {turma.nome}
-                  </p>
+                  </td>
 
-                </td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {dataCriacao
+                      ? new Date(dataCriacao).toLocaleDateString('pt-BR')
+                      : '-'}
+                  </td>
 
+                  <td className="px-6 py-4">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onEdit?.(turma)}
+                        disabled={isLoading}
+                        title="Editar turma"
+                        className="flex items-center gap-2 px-3 py-2 text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        <Edit2 size={14} />
+                        Editar
+                      </button>
 
-
-
-                <td className="px-6 py-4 text-gray-600">
-
-                  {new Date(
-                    turma.created_at ||
-                    turma.createdAt
-                  ).toLocaleDateString(
-                    'pt-BR'
-                  )}
-
-                </td>
-
-
-
-
-
-                <td className="px-6 py-4">
-
-                  <div className="flex justify-center gap-2">
-
-
-                    <button
-
-                      type="button"
-
-                      onClick={() =>
-                        onEdit?.(turma)
-                      }
-
-                      disabled={isLoading}
-
-                      className="
-                        flex
-                        items-center
-                        gap-1
-                        px-3
-                        py-2
-                        text-sm
-                        text-blue-700
-                        bg-blue-100
-                        hover:bg-blue-200
-                        rounded-lg
-                        transition-colors
-                        disabled:opacity-50
-                      "
-
-                    >
-
-                      <Edit2 size={14} />
-
-                      Editar
-
-                    </button>
-
-
-
-
-
-                    <button
-
-                      type="button"
-
-                      onClick={() =>
-                        onDelete?.(turma)
-                      }
-
-                      disabled={isLoading}
-
-                      className="
-                        flex
-                        items-center
-                        gap-1
-                        px-3
-                        py-2
-                        text-sm
-                        text-red-700
-                        bg-red-100
-                        hover:bg-red-200
-                        rounded-lg
-                        transition-colors
-                        disabled:opacity-50
-                      "
-
-                    >
-
-                      <Trash2 size={14} />
-
-                      Excluir
-
-                    </button>
-
-
-                  </div>
-
-
-                </td>
-
-
-              </tr>
-
-
-            ))}
-
-
+                      <button
+                        type="button"
+                        onClick={() => onDelete?.(turma)}
+                        disabled={isLoading}
+                        title="Excluir turma"
+                        className="flex items-center gap-2 px-3 py-2 text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        <Trash2 size={14} />
+                        Excluir
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
-
-
         </table>
-
-
       </div>
-
-
     </div>
   );
 }

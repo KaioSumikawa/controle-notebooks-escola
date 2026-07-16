@@ -27,11 +27,11 @@ export function ProfessorModal({
 
     if (professor) {
       setFormData({
-        nome: professor.nome || '',
-        matricula: professor.matricula || '',
-        email: professor.email || '',
-        telefone: professor.telefone || '',
-        disciplina: professor.disciplina || '',
+        nome: professor.nome ?? '',
+        matricula: professor.matricula ?? '',
+        email: professor.email ?? '',
+        telefone: professor.telefone ?? '',
+        disciplina: professor.disciplina ?? '',
       });
     } else {
       setFormData(initialFormData);
@@ -45,8 +45,8 @@ export function ProfessorModal({
     setError('');
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = ({ target }) => {
+    const { name, value } = target;
 
     setFormData((prev) => ({
       ...prev,
@@ -78,11 +78,9 @@ export function ProfessorModal({
         disciplina: formData.disciplina.trim(),
       });
 
-      resetForm();
+      handleClose();
     } catch (err) {
-      setError(
-        err?.message || 'Erro ao salvar professor.'
-      );
+      setError(err?.message || 'Erro ao salvar professor.');
     }
   };
 
@@ -97,7 +95,6 @@ export function ProfessorModal({
         onSubmit={handleSubmit}
         className="space-y-4"
       >
-
         {/* Nome */}
         <div>
           <label
@@ -115,10 +112,9 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: Carlos Silva"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Matrícula */}
         <div>
@@ -137,12 +133,11 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: 123456"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
 
-
-        {/* Email */}
+        {/* E-mail */}
         <div>
           <label
             htmlFor="professor-email"
@@ -159,10 +154,9 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: professor@escola.com"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Telefone */}
         <div>
@@ -181,10 +175,9 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: (13) 99999-9999"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Disciplina */}
         <div>
@@ -203,10 +196,9 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: Matemática"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
           />
         </div>
-
 
         {/* Erro */}
         {error && (
@@ -217,24 +209,21 @@ export function ProfessorModal({
           </div>
         )}
 
-
         {/* Botões */}
         <div className="flex gap-3 pt-4">
-
           <button
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>
 
-
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
             {isLoading
               ? 'Salvando...'
@@ -242,9 +231,7 @@ export function ProfessorModal({
                 ? 'Atualizar'
                 : 'Cadastrar'}
           </button>
-
         </div>
-
       </form>
     </Modal>
   );

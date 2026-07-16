@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "lucide-react": "1.23.0",
-    "react-router-dom": "7.18.1"
+    "react-router-dom": "7.18.1",
+    "xlsx": "^0.18.5"
   }
 }
