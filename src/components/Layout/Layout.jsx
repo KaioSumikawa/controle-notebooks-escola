@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Sidebar } from '../Sidebar';
 import { Header } from '../Header';
 
-
 export function Layout({
   children,
   title = 'Dashboard',
@@ -11,23 +10,18 @@ export function Layout({
   onSearchChange,
   searchValue = '',
 }) {
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
 
   const handleToggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
 
-
   const handleCloseSidebar = () => {
     setSidebarOpen(false);
   };
 
-
   return (
-    <div className="flex min-h-screen w-full bg-gray-50 overflow-hidden">
-
+    <div className="flex min-h-screen bg-slate-100">
 
       {/* Sidebar */}
       <Sidebar
@@ -35,10 +29,8 @@ export function Layout({
         onClose={handleCloseSidebar}
       />
 
-
       {/* Área principal */}
-      <div className="flex-1 flex flex-col min-w-0">
-
+      <div className="flex flex-1 flex-col min-w-0">
 
         {/* Header */}
         <Header
@@ -50,35 +42,27 @@ export function Layout({
           searchValue={searchValue}
         />
 
-
         {/* Conteúdo */}
-        <main
-          className="
-            flex-1
-            overflow-y-auto
-            bg-gray-50
-          "
-        >
+        <main className="flex-1 overflow-y-auto">
 
           <div
             className="
-              w-full
-              max-w-7xl
               mx-auto
-              p-4
-              md:p-6
+              w-full
+              max-w-screen-2xl
+              px-5
+              py-6
+              md:px-8
+              lg:px-10
+              animate-fade-in
             "
           >
-
             {children}
-
           </div>
 
         </main>
 
-
       </div>
-
 
     </div>
   );

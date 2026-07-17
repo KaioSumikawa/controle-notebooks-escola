@@ -7,7 +7,6 @@ import {
   X,
 } from 'lucide-react';
 
-
 /**
  * Toast reutilizável para mensagens do sistema
  *
@@ -20,7 +19,6 @@ export function Toast({
   duration = 3000,
   onClose,
 }) {
-
   useEffect(() => {
     if (!message) return;
 
@@ -29,18 +27,17 @@ export function Toast({
     }, duration);
 
     return () => clearTimeout(timer);
-
   }, [message, duration, onClose]);
 
-
   if (!message) return null;
-
 
   const configs = {
     success: {
       icon: CheckCircle,
       container:
-        'bg-green-50 border-green-200',
+        'border-green-200 bg-green-50',
+      iconBg:
+        'bg-green-100',
       iconColor:
         'text-green-600',
       textColor:
@@ -50,7 +47,9 @@ export function Toast({
     error: {
       icon: AlertCircle,
       container:
-        'bg-red-50 border-red-200',
+        'border-red-200 bg-red-50',
+      iconBg:
+        'bg-red-100',
       iconColor:
         'text-red-600',
       textColor:
@@ -60,17 +59,21 @@ export function Toast({
     warning: {
       icon: AlertTriangle,
       container:
-        'bg-yellow-50 border-yellow-200',
+        'border-amber-200 bg-amber-50',
+      iconBg:
+        'bg-amber-100',
       iconColor:
-        'text-yellow-600',
+        'text-amber-600',
       textColor:
-        'text-yellow-900',
+        'text-amber-900',
     },
 
     info: {
       icon: Info,
       container:
-        'bg-blue-50 border-blue-200',
+        'border-blue-200 bg-blue-50',
+      iconBg:
+        'bg-blue-100',
       iconColor:
         'text-blue-600',
       textColor:
@@ -78,70 +81,82 @@ export function Toast({
     },
   };
 
-
   const config =
     configs[type] || configs.success;
 
-
   const Icon = config.icon;
-
 
   return (
     <div
       className={`
         fixed
-        bottom-5
-        right-5
+        bottom-6
+        right-6
         z-50
         flex
+        w-full
+        max-w-md
         items-center
-        gap-3
-        max-w-sm
-        p-4
-        rounded-lg
+        gap-4
+        rounded-2xl
         border
-        shadow-lg
+        p-4
+        shadow-2xl
+        backdrop-blur-sm
         animate-in
         slide-in-from-right-5
+        fade-in
         duration-300
         ${config.container}
       `}
       role="alert"
     >
-
-      <Icon
-        size={22}
-        className={config.iconColor}
-      />
-
-
-      <p
+      <div
         className={`
-          flex-1
-          text-sm
-          font-medium
-          ${config.textColor}
+          flex
+          h-11
+          w-11
+          flex-shrink-0
+          items-center
+          justify-center
+          rounded-xl
+          ${config.iconBg}
         `}
       >
-        {message}
-      </p>
+        <Icon
+          size={22}
+          className={config.iconColor}
+        />
+      </div>
 
+      <div className="flex-1">
+        <p
+          className={`
+            text-sm
+            font-medium
+            leading-5
+            ${config.textColor}
+          `}
+        >
+          {message}
+        </p>
+      </div>
 
       <button
         type="button"
         onClick={() => onClose?.()}
         className="
-          text-gray-400
-          hover:text-gray-600
-          transition-colors
+          rounded-lg
+          p-1.5
+          text-slate-400
+          transition
+          hover:bg-black/5
+          hover:text-slate-600
         "
         aria-label="Fechar mensagem"
       >
-
         <X size={18} />
-
       </button>
-
     </div>
   );
 }

@@ -47,6 +47,8 @@ export function TurmaModal({
   };
 
   const handleClose = () => {
+    if (isLoading) return;
+
     resetForm();
     onClose?.();
   };
@@ -83,13 +85,13 @@ export function TurmaModal({
     >
       <form
         onSubmit={handleSubmit}
-        className="space-y-4"
+        className="space-y-5"
       >
         {/* Nome */}
         <div>
           <label
             htmlFor="turma-nome"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Nome da Turma *
           </label>
@@ -102,26 +104,54 @@ export function TurmaModal({
             onChange={handleChange}
             placeholder="Ex: 1º Ano A"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              py-3
+              transition
+              focus:border-blue-500
+              focus:outline-none
+              focus:ring-4
+              focus:ring-blue-100
+            "
           />
         </div>
 
         {/* Erro */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-medium text-red-700">
               {error}
             </p>
           </div>
         )}
 
         {/* Botões */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-3 pt-2">
           <button
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="
+              flex-1
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              px-4
+              py-3
+              font-medium
+              text-slate-700
+              transition
+              hover:bg-slate-50
+              hover:border-slate-300
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
             Cancelar
           </button>
@@ -129,7 +159,20 @@ export function TurmaModal({
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="
+              flex-1
+              rounded-xl
+              bg-blue-600
+              px-4
+              py-3
+              font-semibold
+              text-white
+              transition
+              hover:bg-blue-700
+              hover:shadow-lg
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
             {isLoading
               ? 'Salvando...'

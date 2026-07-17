@@ -55,6 +55,8 @@ export function ProfessorModal({
   };
 
   const handleClose = () => {
+    if (isLoading) return;
+
     resetForm();
     onClose?.();
   };
@@ -93,13 +95,13 @@ export function ProfessorModal({
     >
       <form
         onSubmit={handleSubmit}
-        className="space-y-4"
+        className="space-y-5"
       >
         {/* Nome */}
         <div>
           <label
             htmlFor="professor-nome"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Nome do Professor *
           </label>
@@ -112,7 +114,20 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: Carlos Silva"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              py-3
+              transition
+              focus:border-blue-500
+              focus:outline-none
+              focus:ring-4
+              focus:ring-blue-100
+            "
           />
         </div>
 
@@ -120,7 +135,7 @@ export function ProfessorModal({
         <div>
           <label
             htmlFor="professor-matricula"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Matrícula
           </label>
@@ -133,7 +148,20 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: 123456"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              py-3
+              transition
+              focus:border-blue-500
+              focus:outline-none
+              focus:ring-4
+              focus:ring-blue-100
+            "
           />
         </div>
 
@@ -141,7 +169,7 @@ export function ProfessorModal({
         <div>
           <label
             htmlFor="professor-email"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             E-mail
           </label>
@@ -154,7 +182,20 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: professor@escola.com"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              py-3
+              transition
+              focus:border-blue-500
+              focus:outline-none
+              focus:ring-4
+              focus:ring-blue-100
+            "
           />
         </div>
 
@@ -162,7 +203,7 @@ export function ProfessorModal({
         <div>
           <label
             htmlFor="professor-telefone"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Telefone
           </label>
@@ -175,7 +216,20 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: (13) 99999-9999"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              py-3
+              transition
+              focus:border-blue-500
+              focus:outline-none
+              focus:ring-4
+              focus:ring-blue-100
+            "
           />
         </div>
 
@@ -183,7 +237,7 @@ export function ProfessorModal({
         <div>
           <label
             htmlFor="professor-disciplina"
-            className="block text-sm font-medium text-gray-700 mb-2"
+            className="mb-2 block text-sm font-semibold text-slate-700"
           >
             Disciplina
           </label>
@@ -196,26 +250,54 @@ export function ProfessorModal({
             onChange={handleChange}
             placeholder="Ex: Matemática"
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-slate-300
+              bg-white
+              px-4
+              py-3
+              transition
+              focus:border-blue-500
+              focus:outline-none
+              focus:ring-4
+              focus:ring-blue-100
+            "
           />
         </div>
 
         {/* Erro */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-medium text-red-700">
               {error}
             </p>
           </div>
         )}
 
         {/* Botões */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-3 pt-2">
           <button
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+            className="
+              flex-1
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              px-4
+              py-3
+              font-medium
+              text-slate-700
+              transition
+              hover:bg-slate-50
+              hover:border-slate-300
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
             Cancelar
           </button>
@@ -223,7 +305,20 @@ export function ProfessorModal({
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            className="
+              flex-1
+              rounded-xl
+              bg-blue-600
+              px-4
+              py-3
+              font-semibold
+              text-white
+              transition
+              hover:bg-blue-700
+              hover:shadow-lg
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
             {isLoading
               ? 'Salvando...'

@@ -1,71 +1,71 @@
-import { AlertCircle, Info } from 'lucide-react';
+import {
+  AlertTriangle,
+  Info,
+  X,
+} from 'lucide-react';
 
-/**
- * Modal de confirmação reutilizável
- *
- * Usado para:
- * - Exclusões
- * - Confirmações críticas
- * - Ações administrativas
- */
 export function ConfirmModal({
   isOpen = false,
   title = 'Confirmar ação',
   message = 'Tem certeza que deseja continuar?',
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
-  variant = 'warning', // warning | danger | info
+  variant = 'warning',
   isLoading = false,
   onConfirm,
   onCancel,
 }) {
   if (!isOpen) return null;
 
-
   const getStyles = () => {
     switch (variant) {
       case 'danger':
         return {
-          container: 'border-red-200 bg-red-50',
+          bg: 'bg-red-50',
+          iconBg: 'bg-red-100',
           icon: 'text-red-600',
-          button: 'bg-red-600 hover:bg-red-700',
+          button:
+            'bg-red-600 hover:bg-red-700 focus:ring-red-200',
         };
 
       case 'info':
         return {
-          container: 'border-blue-200 bg-blue-50',
+          bg: 'bg-blue-50',
+          iconBg: 'bg-blue-100',
           icon: 'text-blue-600',
-          button: 'bg-blue-600 hover:bg-blue-700',
+          button:
+            'bg-blue-600 hover:bg-blue-700 focus:ring-blue-200',
         };
 
-      case 'warning':
       default:
         return {
-          container: 'border-yellow-200 bg-yellow-50',
-          icon: 'text-yellow-600',
-          button: 'bg-yellow-600 hover:bg-yellow-700',
+          bg: 'bg-amber-50',
+          iconBg: 'bg-amber-100',
+          icon: 'text-amber-600',
+          button:
+            'bg-amber-500 hover:bg-amber-600 focus:ring-amber-200',
         };
     }
   };
 
-
   const styles = getStyles();
 
-  const Icon = variant === 'info'
-    ? Info
-    : AlertCircle;
-
+  const Icon =
+    variant === 'info'
+      ? Info
+      : AlertTriangle;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-5"
       role="dialog"
       aria-modal="true"
     >
 
       {/* Overlay */}
+
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
         onClick={
           !isLoading
             ? onCancel
@@ -73,103 +73,139 @@ export function ConfirmModal({
         }
       />
 
+      {/* Modal */}
 
-      {/* Conteúdo */}
       <div
-        className={`
+        onClick={(e) => e.stopPropagation()}
+        className="
           relative
           w-full
-          max-w-lg
-          bg-white
-          rounded-lg
-          shadow-xl
-          border
+          max-w-md
           overflow-hidden
-        `}
-        onClick={(e) => e.stopPropagation()}
+          rounded-2xl
+          bg-white
+          shadow-2xl
+          animate-in
+          fade-in
+          zoom-in-95
+          duration-200
+        "
       >
 
         {/* Header */}
+
         <div
-          className={`
-            flex
-            items-center
-            gap-3
-            px-6
-            py-5
-            border-b
-            border-gray-200
-            ${styles.container}
-          `}
+          className={`flex items-center justify-between px-6 py-5 ${styles.bg}`}
         >
 
-          <Icon
-            size={26}
-            className={styles.icon}
-          />
+          <div className="flex items-center gap-4">
 
-          <h2 className="text-lg font-semibold text-gray-900">
-            {title}
-          </h2>
+            <div
+              className={`
+                flex
+                h-12
+                w-12
+                items-center
+                justify-center
+                rounded-2xl
+                ${styles.iconBg}
+              `}
+            >
+              <Icon
+                size={24}
+                className={styles.icon}
+              />
+            </div>
+
+            <div>
+
+              <h2 className="text-lg font-semibold text-slate-900">
+                {title}
+              </h2>
+
+            </div>
+
+          </div>
+
+          <button
+            onClick={onCancel}
+            disabled={isLoading}
+            className="
+              rounded-xl
+              p-2
+              text-slate-400
+              transition
+              hover:bg-white
+              hover:text-slate-700
+              disabled:opacity-40
+            "
+          >
+            <X size={18} />
+          </button>
 
         </div>
 
+        {/* Conteúdo */}
 
-        {/* Mensagem */}
-        <div className="p-6">
+        <div className="px-6 py-6">
 
-          <p className="text-gray-700 leading-relaxed">
+          <p className="leading-7 text-slate-600">
             {message}
           </p>
 
         </div>
 
+        {/* Footer */}
 
-        {/* Ações */}
-        <div className="flex gap-3 px-6 py-4 border-t border-gray-200">
+        <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-6 py-5 sm:flex-row sm:justify-end">
 
           <button
             type="button"
             onClick={onCancel}
             disabled={isLoading}
             className="
-              flex-1
-              px-4
-              py-2
-              rounded-lg
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              px-5
+              py-2.5
               font-medium
-              text-gray-700
-              bg-gray-100
-              hover:bg-gray-200
-              transition-colors
+              text-slate-600
+              transition
+
+              hover:bg-slate-100
+
+              disabled:cursor-not-allowed
               disabled:opacity-50
             "
           >
             {cancelText}
           </button>
 
-
           <button
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
             className={`
-              flex-1
-              px-4
-              py-2
-              rounded-lg
+              rounded-xl
+              px-5
+              py-2.5
               font-medium
               text-white
-              transition-colors
+              transition
+              focus:outline-none
+              focus:ring-4
+
+              disabled:cursor-not-allowed
               disabled:opacity-50
+
               ${styles.button}
             `}
           >
-            {
-              isLoading
-                ? 'Processando...'
-                : confirmText
-            }
+            {isLoading
+              ? 'Processando...'
+              : confirmText}
           </button>
 
         </div>

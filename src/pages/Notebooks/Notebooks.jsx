@@ -6,8 +6,18 @@ import {
   NotebookModal,
   Toast,
 } from '../../components';
-import { Laptop } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+
+import {
+  Laptop,
+  Plus,
+} from 'lucide-react';
+
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
 import { useLocation } from 'react-router-dom';
 import { useNotebooks } from '../../hooks/useNotebooks';
 
@@ -61,76 +71,158 @@ export function Notebooks() {
 
     return notebooks.filter((notebook) => {
       const correspondeFiltro =
-        filtro === 'todos' || notebook.status === filtro;
+        filtro === 'todos' ||
+        notebook.status === filtro;
 
       const correspondeBusca =
         notebook.id.toLowerCase().includes(busca) ||
-        (notebook.modelo || '').toLowerCase().includes(busca) ||
-        (notebook.patrimonio || '').toLowerCase().includes(busca);
+        (notebook.modelo || '')
+          .toLowerCase()
+          .includes(busca) ||
+        (notebook.patrimonio || '')
+          .toLowerCase()
+          .includes(busca);
 
-      return correspondeFiltro && correspondeBusca;
+      return (
+        correspondeFiltro &&
+        correspondeBusca
+      );
     });
   }, [notebooks, filtro, searchValue]);
 
+  const filtros = [
+    ['todos', 'Todos'],
+    ['disponivel', 'Disponíveis'],
+    ['emprestado', 'Emprestados'],
+    ['manutencao', 'Manutenção'],
+  ];
+
   return (
     <Layout
-      title="Gerenciar Notebooks"
+      title="Notebooks"
       onSearchChange={setSearchValue}
       searchValue={searchValue}
     >
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+      <div className="space-y-8">
+
+        {/* Cabeçalho */}
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               Notebooks
             </h2>
 
-            <p className="text-gray-600 mt-1">
-              Gerencie o inventário de notebooks da escola.
+            <p className="mt-2 text-slate-500">
+              Gerencie todo o inventário de notebooks da escola.
             </p>
           </div>
 
           <button
             onClick={() => handleOpenModal()}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            className="
+              inline-flex
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              bg-blue-600
+              px-5
+              py-3
+              font-medium
+              text-white
+              shadow-sm
+              transition-all
+              hover:bg-blue-700
+              hover:shadow-lg
+            "
           >
-            + Adicionar Notebook
+            <Plus size={18} />
+
+            Novo Notebook
           </button>
+
         </div>
 
-        {/* Pesquisa */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
+        {/* Pesquisa + filtros */}
+        <div
+          className="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            p-6
+            shadow-sm
+            space-y-5
+          "
+        >
+
           <SearchBar
             placeholder="Pesquisar por patrimônio, identificação ou modelo..."
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) =>
+              setSearchValue(e.target.value)
+            }
           />
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {[
-              ['todos', 'Todos'],
-              ['disponivel', 'Disponíveis'],
-              ['emprestado', 'Emprestados'],
-              ['manutencao', 'Manutenção'],
-            ].map(([valor, texto]) => (
+          <div className="flex flex-wrap gap-2">
+
+            {filtros.map(([valor, texto]) => (
+
               <button
                 key={valor}
                 onClick={() => setFiltro(valor)}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  filtro === valor
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className={`
+                  rounded-full
+                  px-4
+                  py-2
+                  text-sm
+                  font-medium
+                  transition-all
+
+                  ${
+                    filtro === valor
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : `
+                        bg-slate-100
+                        text-slate-600
+                        hover:bg-slate-200
+                      `
+                  }
+                `}
               >
                 {texto}
               </button>
+
             ))}
+
           </div>
+
+          <div className="border-t border-slate-200 pt-4">
+
+            <p className="text-sm text-slate-500">
+
+              <span className="font-semibold text-slate-700">
+                {notebooksFiltrados.length}
+              </span>
+
+              {' '}
+              notebook
+              {notebooksFiltrados.length !== 1 && 's'}
+              {' '}
+              encontrado
+              {notebooksFiltrados.length !== 1 && 's'}
+
+            </p>
+
+          </div>
+
         </div>
 
         {/* Conteúdo */}
+
         {notebooksFiltrados.length === 0 ? (
+
           <EmptyState
             title={
               isLoading
@@ -144,14 +236,18 @@ export function Notebooks() {
             }
             icon={Laptop}
           />
+
         ) : (
+
           <NotebookTable
             notebooks={notebooksFiltrados}
             onEdit={handleOpenModal}
           />
+
         )}
 
         {/* Modal */}
+
         <NotebookModal
           isOpen={showModal}
           notebook={selectedNotebook}
@@ -161,11 +257,17 @@ export function Notebooks() {
         />
 
         {/* Toast */}
+
         <Toast
           message={success || error}
-          type={error ? 'error' : 'success'}
+          type={
+            error
+              ? 'error'
+              : 'success'
+          }
           onClose={clearMessages}
         />
+
       </div>
     </Layout>
   );

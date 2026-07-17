@@ -47,7 +47,7 @@ export function TurmaTable({
                   className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-4 font-medium text-gray-900">
-                    {turma.nome}
+                    {turma.nome || '-'}
                   </td>
 
                   <td className="px-6 py-4 text-gray-700">
@@ -61,9 +61,9 @@ export function TurmaTable({
                       <button
                         type="button"
                         onClick={() => onEdit?.(turma)}
-                        disabled={isLoading}
+                        disabled={isLoading || !onEdit}
                         title="Editar turma"
-                        className="flex items-center gap-2 px-3 py-2 text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-2 text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Edit2 size={14} />
                         Editar
@@ -72,9 +72,9 @@ export function TurmaTable({
                       <button
                         type="button"
                         onClick={() => onDelete?.(turma)}
-                        disabled={isLoading}
+                        disabled={isLoading || !onDelete}
                         title="Excluir turma"
-                        className="flex items-center gap-2 px-3 py-2 text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-2 text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Trash2 size={14} />
                         Excluir

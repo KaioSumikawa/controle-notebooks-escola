@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Calendar, BookOpen, User, Laptop } from 'lucide-react';
 import { Modal } from './Modal';
 
 const getToday = () => new Date().toISOString().split('T')[0];
@@ -11,9 +12,6 @@ const createInitialState = () => ({
   observacao: '',
 });
 
-/**
- * Modal para registrar/editar empréstimos
- */
 export function EmprestimoModal({
   isOpen = false,
   emprestimo = null,
@@ -95,6 +93,24 @@ export function EmprestimoModal({
     }
   };
 
+  const inputClass = `
+    w-full
+    rounded-xl
+    border
+    border-slate-200
+    bg-slate-50
+    px-4
+    py-3
+    text-sm
+    transition-all
+    duration-200
+    focus:bg-white
+    focus:border-blue-500
+    focus:ring-4
+    focus:ring-blue-100
+    focus:outline-none
+  `;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -102,177 +118,178 @@ export function EmprestimoModal({
       title={emprestimo ? 'Editar Empréstimo' : 'Novo Empréstimo'}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Notebook */}
-        <div>
-          <label
-            htmlFor="notebook"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Notebook *
-          </label>
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-          <select
-            id="notebook"
-            name="notebook"
-            value={formData.notebook}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          >
-            <option value="">Selecione um notebook</option>
+          {/* Notebook */}
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+              <Laptop size={16} />
+              Notebook
+            </label>
 
-            {notebooks.map((notebook) => (
-              <option key={notebook.id} value={notebook.id}>
-                {notebook.nome || notebook.numero || notebook.id}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Professor */}
-        <div>
-          <label
-            htmlFor="professor"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Professor *
-          </label>
-
-          {professores.length > 0 ? (
             <select
-              id="professor"
-              name="professor"
-              value={formData.professor}
+              name="notebook"
+              value={formData.notebook}
               onChange={handleChange}
               disabled={isLoading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              className={inputClass}
             >
-              <option value="">Selecione um professor</option>
+              <option value="">Selecione um notebook</option>
 
-              {professores.map((professor) => (
+              {notebooks.map((notebook) => (
                 <option
-                  key={professor.id}
-                  value={professor.nome}
+                  key={notebook.id}
+                  value={notebook.id}
                 >
-                  {professor.nome}
+                  {notebook.nome || notebook.numero || notebook.id}
                 </option>
               ))}
             </select>
-          ) : (
+          </div>
+
+          {/* Data */}
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+              <Calendar size={16} />
+              Data
+            </label>
+
             <input
-              id="professor"
-              name="professor"
-              type="text"
-              value={formData.professor}
+              type="date"
+              name="dataEmprestimo"
+              value={formData.dataEmprestimo}
               onChange={handleChange}
-              placeholder="Nome do professor"
               disabled={isLoading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              className={inputClass}
             />
-          )}
-        </div>
+          </div>
 
-        {/* Turma */}
-        <div>
-          <label
-            htmlFor="turma"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Turma *
-          </label>
+          {/* Professor */}
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+              <User size={16} />
+              Professor
+            </label>
 
-          {turmas.length > 0 ? (
-            <select
-              id="turma"
-              name="turma"
-              value={formData.turma}
-              onChange={handleChange}
-              disabled={isLoading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            >
-              <option value="">Selecione uma turma</option>
+            {professores.length > 0 ? (
+              <select
+                name="professor"
+                value={formData.professor}
+                onChange={handleChange}
+                disabled={isLoading}
+                className={inputClass}
+              >
+                <option value="">Selecione um professor</option>
 
-              {turmas.map((turma) => (
-                <option
-                  key={turma.id}
-                  value={turma.nome}
-                >
-                  {turma.nome}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              id="turma"
-              name="turma"
-              type="text"
-              value={formData.turma}
-              onChange={handleChange}
-              placeholder="Ex: 2º Ano A"
-              disabled={isLoading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-            />
-          )}
-        </div>
+                {professores.map((professor) => (
+                  <option
+                    key={professor.id}
+                    value={professor.nome}
+                  >
+                    {professor.nome}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                name="professor"
+                value={formData.professor}
+                onChange={handleChange}
+                placeholder="Nome do professor"
+                disabled={isLoading}
+                className={inputClass}
+              />
+            )}
+          </div>
 
-        {/* Data */}
-        <div>
-          <label
-            htmlFor="dataEmprestimo"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Data do Empréstimo
-          </label>
+          {/* Turma */}
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+              <BookOpen size={16} />
+              Turma
+            </label>
 
-          <input
-            id="dataEmprestimo"
-            name="dataEmprestimo"
-            type="date"
-            value={formData.dataEmprestimo}
-            onChange={handleChange}
-            disabled={isLoading}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-          />
+            {turmas.length > 0 ? (
+              <select
+                name="turma"
+                value={formData.turma}
+                onChange={handleChange}
+                disabled={isLoading}
+                className={inputClass}
+              >
+                <option value="">Selecione uma turma</option>
+
+                {turmas.map((turma) => (
+                  <option
+                    key={turma.id}
+                    value={turma.nome}
+                  >
+                    {turma.nome}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                name="turma"
+                value={formData.turma}
+                onChange={handleChange}
+                placeholder="Ex: 3º Ano A"
+                disabled={isLoading}
+                className={inputClass}
+              />
+            )}
+          </div>
+
         </div>
 
         {/* Observação */}
         <div>
-          <label
-            htmlFor="observacao"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
+          <label className="mb-2 block text-sm font-medium text-slate-700">
             Observação
           </label>
 
           <textarea
-            id="observacao"
+            rows={4}
             name="observacao"
-            rows={3}
             value={formData.observacao}
             onChange={handleChange}
-            placeholder="Observações..."
+            placeholder="Digite alguma observação..."
             disabled={isLoading}
-            className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className={`${inputClass} resize-none`}
           />
         </div>
 
-        {/* Mensagem de erro */}
         {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <p className="text-sm text-red-700">
               {error}
             </p>
           </div>
         )}
 
-        {/* Botões */}
-        <div className="flex gap-3 pt-2">
+        <div className="flex justify-end gap-3 pt-2 border-t border-slate-200">
           <button
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="flex-1 rounded-lg bg-gray-100 px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-50"
+            className="
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              px-5
+              py-3
+              font-medium
+              text-slate-700
+              transition
+              hover:bg-slate-100
+            "
           >
             Cancelar
           </button>
@@ -280,7 +297,20 @@ export function EmprestimoModal({
           <button
             type="submit"
             disabled={isLoading}
-            className="flex-1 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+            className="
+              rounded-xl
+              bg-gradient-to-r
+              from-blue-600
+              to-indigo-600
+              px-6
+              py-3
+              font-semibold
+              text-white
+              shadow-lg
+              transition-all
+              hover:scale-[1.02]
+              hover:shadow-xl
+            "
           >
             {isLoading
               ? 'Salvando...'

@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { Menu, LogOut } from 'lucide-react';
-import { SearchBar } from '../SearchBar';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Menu,
+  LogOut,
+  CalendarDays,
+} from 'lucide-react';
 
+import { SearchBar } from '../SearchBar';
 
 export function Header({
   title = 'Dashboard',
@@ -11,276 +15,172 @@ export function Header({
   onSearchChange,
   searchValue = '',
 }) {
-
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const menuRef = useRef(null);
 
-
-  // Futuramente virá do Supabase Auth
+  // Futuramente virá do Supabase
   const usuario = {
     nome: 'Administrador',
     email: 'admin@escola.edu.br',
   };
 
+  const inicial = usuario.nome.charAt(0).toUpperCase();
 
-  const inicial =
-    usuario.nome
-      .charAt(0)
-      .toUpperCase();
-
-
+  const dataAtual = useMemo(() => {
+    return new Intl.DateTimeFormat('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date());
+  }, []);
 
   useEffect(() => {
-
-    const handleClickOutside = (event) => {
-
+    function handleClickOutside(event) {
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target)
       ) {
         setShowUserMenu(false);
       }
+    }
 
-    };
+    document.addEventListener('mousedown', handleClickOutside);
 
-
-    document.addEventListener(
-      'mousedown',
-      handleClickOutside
-    );
-
-
-    return () => {
+    return () =>
       document.removeEventListener(
         'mousedown',
         handleClickOutside
       );
-    };
-
   }, []);
 
-
-
-  const handleToggleUserMenu = () => {
-    setShowUserMenu((prev) => !prev);
-  };
-
-
-  const handleLogout = () => {
-    // Futuramente integrar com Supabase Auth
-    console.log('Logout');
-  };
-
-
   return (
-    <header
-      className="
-        bg-white
-        border-b
-        border-gray-200
-        sticky
-        top-0
-        z-40
-      "
-    >
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
 
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-          h-16
-          px-4
-          md:px-6
-          gap-4
-        "
-      >
+      <div className="flex items-center justify-between px-6 py-5">
 
-
-        {/* Menu + Título */}
-        <div className="flex items-center gap-4 min-w-0">
-
+        {/* Esquerda */}
+        <div className="flex items-center gap-5">
 
           <button
-            type="button"
             onClick={onMenuClick}
-            className="
-              lg:hidden
-              p-2
-              rounded-lg
-              hover:bg-gray-100
-              transition-colors
-            "
-            aria-label="Abrir menu"
+            className="lg:hidden rounded-xl p-2 hover:bg-slate-100 transition"
           >
-
-            <Menu
-              size={22}
-              className="text-gray-600"
-            />
-
+            <Menu size={22} />
           </button>
 
+          <div>
 
+            <p className="text-sm text-slate-500">
+              Bem-vindo ao sistema 👋
+            </p>
 
-          <h1
-            className="
-              text-lg
-              md:text-xl
-              font-semibold
-              text-gray-900
-              truncate
-            "
-          >
-            {title}
-          </h1>
+            <h1 className="text-2xl font-bold text-slate-900">
+              {title}
+            </h1>
 
+          </div>
 
         </div>
 
+        {/* Centro */}
+        {showSearch && (
+          <div className="hidden lg:block w-full max-w-md px-8">
+            <SearchBar
+              placeholder={searchPlaceholder}
+              value={searchValue}
+              onChange={(e) =>
+                onSearchChange?.(e.target.value)
+              }
+            />
+          </div>
+        )}
 
-
-        {/* Pesquisa */}
-        {
-          showSearch && (
-            <div
-              className="
-                hidden
-                md:block
-                flex-1
-                max-w-md
-              "
-            >
-
-              <SearchBar
-                placeholder={searchPlaceholder}
-                value={searchValue}
-                onChange={(e) =>
-                  onSearchChange?.(e.target.value)
-                }
-              />
-
-            </div>
-          )
-        }
-
-
-
-        {/* Usuário */}
+        {/* Direita */}
         <div
-          className="relative"
+          className="flex items-center gap-5"
           ref={menuRef}
         >
 
-          <button
-            type="button"
-            onClick={handleToggleUserMenu}
-            className="
-              w-10
-              h-10
-              rounded-full
-              bg-blue-600
-              flex
-              items-center
-              justify-center
-              text-white
-              font-semibold
-              hover:ring-2
-              hover:ring-blue-300
-              transition-all
-            "
-            aria-expanded={showUserMenu}
-            aria-label="Abrir menu do usuário"
-          >
+          {/* Data */}
+          <div className="hidden xl:flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2">
 
-            {inicial}
+            <CalendarDays
+              size={18}
+              className="text-slate-500"
+            />
 
-          </button>
+            <span className="text-sm text-slate-600 capitalize">
+              {dataAtual}
+            </span>
 
+          </div>
 
+          {/* Usuário */}
+          <div className="relative">
 
-          {
-            showUserMenu && (
-              <div
-                className="
-                  absolute
-                  right-0
-                  mt-2
-                  w-60
-                  bg-white
-                  rounded-lg
-                  shadow-lg
-                  border
-                  border-gray-200
-                  py-2
-                "
-              >
+            <button
+              onClick={() =>
+                setShowUserMenu(!showUserMenu)
+              }
+              className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 hover:border-blue-300 hover:shadow-sm transition"
+            >
 
-                <div
-                  className="
-                    px-4
-                    py-3
-                    border-b
-                    border-gray-100
-                  "
-                >
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 font-semibold text-white">
 
-                  <p
-                    className="
-                      text-sm
-                      font-semibold
-                      text-gray-900
-                    "
-                  >
+                {inicial}
+
+              </div>
+
+              <div className="hidden md:block text-left">
+
+                <p className="text-sm font-semibold text-slate-900">
+                  {usuario.nome}
+                </p>
+
+                <p className="text-xs text-slate-500">
+                  Administrador
+                </p>
+
+              </div>
+
+            </button>
+
+            {showUserMenu && (
+
+              <div className="absolute right-0 mt-3 w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+
+                <div className="border-b border-slate-100 p-5">
+
+                  <p className="font-semibold text-slate-900">
                     {usuario.nome}
                   </p>
 
-
-                  <p
-                    className="
-                      text-xs
-                      text-gray-500
-                    "
-                  >
+                  <p className="mt-1 text-sm text-slate-500">
                     {usuario.email}
                   </p>
 
                 </div>
 
-
-
                 <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="
-                    w-full
-                    flex
-                    items-center
-                    gap-2
-                    px-4
-                    py-2
-                    text-sm
-                    text-red-600
-                    hover:bg-red-50
-                    transition-colors
-                  "
+                  onClick={() => console.log('logout')}
+                  className="flex w-full items-center gap-3 px-5 py-4 text-sm text-red-600 hover:bg-red-50 transition"
                 >
 
-                  <LogOut size={16} />
+                  <LogOut size={18} />
 
                   Sair
 
                 </button>
 
-
               </div>
-            )
-          }
 
+            )}
+
+          </div>
 
         </div>
-
 
       </div>
 

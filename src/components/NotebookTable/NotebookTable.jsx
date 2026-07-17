@@ -59,15 +59,17 @@ export function NotebookTable({
                 className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
               >
                 <td className="px-6 py-4 font-medium text-gray-900">
-                  {String(notebook.numero ?? '').padStart(2, '0')}
+                  {notebook.numero != null
+                    ? String(notebook.numero).padStart(2, '0')
+                    : '-'}
                 </td>
 
                 <td className="px-6 py-4 font-medium text-gray-900">
-                  {notebook.id ?? '-'}
+                  {notebook.id || '-'}
                 </td>
 
                 <td className="px-6 py-4 text-gray-700">
-                  {notebook.modelo ?? '-'}
+                  {notebook.modelo || '-'}
                 </td>
 
                 <td className="px-6 py-4 text-gray-700">
@@ -87,7 +89,8 @@ export function NotebookTable({
                     <button
                       type="button"
                       onClick={() => onEdit?.(notebook)}
-                      className="flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                      disabled={!onEdit}
+                      className="flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Editar notebook"
                     >
                       <Pencil size={16} />
@@ -97,7 +100,8 @@ export function NotebookTable({
                     <button
                       type="button"
                       onClick={() => onDelete?.(notebook)}
-                      className="flex items-center gap-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                      disabled={!onDelete}
+                      className="flex items-center gap-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Excluir notebook"
                     >
                       <Trash2 size={16} />

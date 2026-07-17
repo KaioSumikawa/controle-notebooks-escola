@@ -1,29 +1,77 @@
-export function StatusBadge({ status, variant = 'default' }) {
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case 'disponível':
-      case 'disponivel':
-        return 'bg-green-100 text-green-800';
-      case 'emprestado':
-        return 'bg-blue-100 text-blue-800';
-      case 'manutenção':
-      case 'manutencao':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'danificado':
-        return 'bg-red-100 text-red-800';
-      case 'ativo':
-        return 'bg-green-100 text-green-800';
-      case 'inativo':
-        return 'bg-gray-100 text-gray-800';
-      case 'pendente':
-        return 'bg-orange-100 text-orange-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+const variants = {
+  disponivel: {
+    container: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+    dot: 'bg-emerald-500',
+  },
+
+  emprestado: {
+    container: 'bg-blue-50 border-blue-200 text-blue-700',
+    dot: 'bg-blue-500',
+  },
+
+  manutencao: {
+    container: 'bg-amber-50 border-amber-200 text-amber-700',
+    dot: 'bg-amber-500',
+  },
+
+  danificado: {
+    container: 'bg-red-50 border-red-200 text-red-700',
+    dot: 'bg-red-500',
+  },
+
+  ativo: {
+    container: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+    dot: 'bg-emerald-500',
+  },
+
+  inativo: {
+    container: 'bg-slate-100 border-slate-200 text-slate-700',
+    dot: 'bg-slate-500',
+  },
+
+  pendente: {
+    container: 'bg-orange-50 border-orange-200 text-orange-700',
+    dot: 'bg-orange-500',
+  },
+
+  default: {
+    container: 'bg-slate-100 border-slate-200 text-slate-700',
+    dot: 'bg-slate-500',
+  },
+};
+
+export function StatusBadge({ status = '' }) {
+  const key = status
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  const style = variants[key] || variants.default;
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(status)}`}>
+    <span
+      className={`
+        inline-flex
+        items-center
+        gap-2
+        rounded-full
+        border
+        px-3
+        py-1.5
+        text-xs
+        font-semibold
+        ${style.container}
+      `}
+    >
+      <span
+        className={`
+          h-2
+          w-2
+          rounded-full
+          ${style.dot}
+        `}
+      />
+
       {status}
     </span>
   );

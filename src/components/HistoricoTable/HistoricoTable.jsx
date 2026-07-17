@@ -90,7 +90,7 @@ export function HistoricoTable({
                         />
 
                         <span className="font-medium text-gray-900">
-                          {item.notebookId}
+                          {item.notebookId || '-'}
                         </span>
                       </div>
                     </td>
@@ -104,7 +104,7 @@ export function HistoricoTable({
                         />
 
                         <span className="text-gray-700">
-                          {item.professor}
+                          {item.professor || '-'}
                         </span>
                       </div>
                     </td>
