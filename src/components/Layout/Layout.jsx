@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from '../Sidebar';
 import { Header } from '../Header';
 
@@ -10,41 +10,65 @@ export function Layout({
   onSearchChange,
   searchValue = '',
 }) {
+  // Sidebar Mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Sidebar Desktop
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const isDesktop = () =>
+    typeof window !== 'undefined' &&
+    window.innerWidth >= 1024;
+
   const handleToggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
+    if (isDesktop()) {
+      setSidebarCollapsed((prev) => !prev);
+    } else {
+      setSidebarOpen((prev) => !prev);
+    }
   };
 
   const handleCloseSidebar = () => {
     setSidebarOpen(false);
   };
 
-  return (
-    <div className="flex min-h-screen bg-slate-100">
+  useEffect(() => {
+    const handleResize = () => {
+      if (isDesktop()) {
+        setSidebarOpen(false);
+      }
+    };
 
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-slate-100">
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
+        collapsed={sidebarCollapsed}
         onClose={handleCloseSidebar}
       />
 
-      {/* Área principal */}
-      <div className="flex flex-1 flex-col min-w-0">
-
+      {/* Conteúdo */}
+      <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
         <Header
-          title={title}
           onMenuClick={handleToggleSidebar}
+          sidebarCollapsed={sidebarCollapsed}
           showSearch={showSearch}
           searchPlaceholder={searchPlaceholder}
           onSearchChange={onSearchChange}
           searchValue={searchValue}
         />
 
-        {/* Conteúdo */}
+        {/* Main */}
         <main className="flex-1 overflow-y-auto">
-
           <div
             className="
               mx-auto
@@ -59,11 +83,8 @@ export function Layout({
           >
             {children}
           </div>
-
         </main>
-
       </div>
-
     </div>
   );
 }

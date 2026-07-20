@@ -1,5 +1,4 @@
 import {
-  ChevronRight,
   ArrowUpRight,
 } from 'lucide-react';
 
@@ -72,13 +71,14 @@ export function DashboardCard({
             ? `
               cursor-pointer
               hover:-translate-y-1
-              hover:shadow-xl
               hover:border-slate-300
+              hover:shadow-xl
             `
             : ''
         }
       `}
     >
+
       {/* Barra superior */}
       <div className={`h-1.5 w-full ${style.line}`} />
 
@@ -135,18 +135,15 @@ export function DashboardCard({
               Clique para visualizar
             </span>
 
-            <div className="flex items-center gap-1 text-blue-600 transition-transform duration-300 group-hover:translate-x-1">
-
-              <ArrowUpRight size={16} />
-
-              <ChevronRight size={18} />
-
+            <div className="text-blue-600 transition-transform duration-300 group-hover:translate-x-1">
+              <ArrowUpRight size={18} />
             </div>
 
           </div>
         )}
 
       </div>
+
     </div>
   );
-}
+}2
