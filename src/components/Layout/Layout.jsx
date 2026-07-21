@@ -48,27 +48,29 @@ export function Layout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100">
+
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
         collapsed={sidebarCollapsed}
         onClose={handleCloseSidebar}
+        onToggle={handleToggleSidebar}
       />
 
-      {/* Conteúdo */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
+      {/* Área principal */}
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+
+        {/* Header flutuante */}
         <Header
-          onMenuClick={handleToggleSidebar}
-          sidebarCollapsed={sidebarCollapsed}
           showSearch={showSearch}
           searchPlaceholder={searchPlaceholder}
           onSearchChange={onSearchChange}
           searchValue={searchValue}
         />
 
-        {/* Main */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Conteúdo */}
+        <main className="flex-1 overflow-y-auto pt-20">
+
           <div
             className="
               mx-auto
@@ -83,8 +85,11 @@ export function Layout({
           >
             {children}
           </div>
+
         </main>
+
       </div>
+
     </div>
   );
 }

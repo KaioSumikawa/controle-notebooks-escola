@@ -1,177 +1,121 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { LogOut, CalendarDays } from 'lucide-react';
-import { SearchBar } from '../SearchBar';
+import {
+  Search,
+  Bell,
+  Grid3X3,
+} from 'lucide-react';
 
-export function Header({
-  showSearch = false,
-  searchPlaceholder = 'Pesquisar...',
-  onSearchChange,
-  searchValue = '',
-}) {
-  const [showUserMenu, setShowUserMenu] = useState(false);
-
-  const menuRef = useRef(null);
-
-  // Futuramente virá do Supabase
-  const usuario = {
-    nome: 'Administrador',
-    email: 'admin@escola.edu.br',
-  };
-
-  const inicial = usuario.nome.charAt(0).toUpperCase();
-
-  const dataAtual = useMemo(() => {
-    return new Intl.DateTimeFormat('pt-BR', {
-      weekday: 'long',
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    }).format(new Date());
-  }, []);
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target)
-      ) {
-        setShowUserMenu(false);
-      }
-    }
-
-    document.addEventListener(
-      'mousedown',
-      handleClickOutside
-    );
-
-    return () =>
-      document.removeEventListener(
-        'mousedown',
-        handleClickOutside
-      );
-  }, []);
-
+export function Header() {
   return (
-    <header className="sticky top-0 z-30 h-20 w-full shrink-0 border-b border-slate-200 bg-white">
+    <header
+      className="
+        pointer-events-none
+        absolute
+        right-0
+        top-0
+        z-30
+      "
+    >
+      <div className="flex items-center px-6 py-4">
 
-      <div className="flex h-full items-center justify-between px-6">
-
-        {/* Esquerda */}
-        <div className="flex flex-1 items-center">
-
-          {showSearch && (
-            <div className="w-full max-w-xl">
-              <SearchBar
-                placeholder={searchPlaceholder}
-                value={searchValue}
-                onChange={(e) =>
-                  onSearchChange?.(e.target.value)
-                }
-              />
-            </div>
-          )}
-
-        </div>
-
-        {/* Direita */}
         <div
-          className="flex items-center gap-4"
-          ref={menuRef}
+          className="
+            pointer-events-auto
+            flex
+            items-center
+            gap-5
+          "
         >
 
-          {/* Data */}
-          <div className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 xl:flex">
+          {/* Pesquisar */}
+          <button
+            type="button"
+            title="Pesquisar"
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              text-slate-500
+              transition
+              duration-200
+              hover:bg-slate-200/70
+              hover:text-slate-900
+            "
+          >
+            <Search
+              size={24}
+              strokeWidth={1.8}
+            />
+          </button>
 
-            <CalendarDays
-              size={16}
-              className="text-slate-500"
+          {/* Notificações */}
+          <button
+            type="button"
+            title="Notificações"
+            className="
+              relative
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              text-slate-500
+              transition
+              duration-200
+              hover:bg-slate-200/70
+              hover:text-slate-900
+            "
+          >
+            <Bell
+              size={24}
+              strokeWidth={1.8}
             />
 
-            <span className="text-xs font-medium capitalize text-slate-600">
-              {dataAtual}
-            </span>
-
-          </div>
-
-          {/* Usuário */}
-          <div className="relative">
-
-            <button
-              onClick={() =>
-                setShowUserMenu((prev) => !prev)
-              }
+            <span
               className="
-                flex
-                items-center
-                gap-3
-                rounded-2xl
-                border
-                border-slate-200
-                bg-white
-                px-3
-                py-2
-                transition-all
-                duration-200
-                hover:border-slate-300
-                hover:shadow-sm
+                absolute
+                right-1.5
+                top-1.5
+                h-2
+                w-2
+                rounded-full
+                bg-blue-600
+                ring-2
+                ring-slate-100
               "
-            >
+            />
+          </button>
 
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white shadow-sm">
-                {inicial}
-              </div>
-
-              <div className="hidden text-left md:block">
-
-                <p className="text-xs font-semibold text-slate-800">
-                  {usuario.nome}
-                </p>
-
-                <p className="text-[11px] text-slate-500">
-                  Administrador
-                </p>
-
-              </div>
-
-            </button>
-
-            {showUserMenu && (
-
-              <div className="absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg">
-
-                <div className="border-b border-slate-100 p-3">
-
-                  <p className="text-xs font-semibold text-slate-900">
-                    {usuario.nome}
-                  </p>
-
-                  <p className="mt-0.5 truncate text-xs text-slate-500">
-                    {usuario.email}
-                  </p>
-
-                </div>
-
-                <button
-                  onClick={() => console.log('logout')}
-                  className="mt-1 flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-red-600 transition hover:bg-red-50"
-                >
-
-                  <LogOut size={16} />
-
-                  Sair
-
-                </button>
-
-              </div>
-
-            )}
-
-          </div>
+          {/* Menu de aplicações */}
+          <button
+            type="button"
+            title="Menu"
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              text-slate-500
+              transition
+              duration-200
+              hover:bg-slate-200/70
+              hover:text-slate-900
+            "
+          >
+            <Grid3X3
+              size={23}
+              strokeWidth={1.8}
+            />
+          </button>
 
         </div>
 
       </div>
-
     </header>
   );
 }

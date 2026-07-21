@@ -8,6 +8,8 @@ import {
   Settings,
   Users,
   UserRound,
+  Menu,
+  LogOut,
 } from 'lucide-react';
 
 import { Link, useLocation } from 'react-router-dom';
@@ -16,6 +18,7 @@ export function Sidebar({
   isOpen = false,
   collapsed = false,
   onClose,
+  onToggle,
 }) {
   const location = useLocation();
 
@@ -31,7 +34,15 @@ export function Sidebar({
     { icon: Settings, label: 'Configurações', path: '/configuracoes' },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const usuario = {
+    nome: 'Administrador',
+    cargo: 'Administrador',
+  };
+
+  const inicial = usuario.nome.charAt(0).toUpperCase();
+
+  const isActive = (path) =>
+    location.pathname === path;
 
   return (
     <>
@@ -58,7 +69,9 @@ export function Sidebar({
           transition-all
           duration-300
           lg:relative
+
           ${collapsed ? 'w-20' : 'w-72'}
+
           ${
             isOpen
               ? 'translate-x-0'
@@ -66,8 +79,35 @@ export function Sidebar({
           }
         `}
       >
-        {/* Espaço do Header */}
-        <div className="h-20 shrink-0 border-b border-slate-200" />
+        {/* Topo da Sidebar */}
+        <div
+          className="
+            flex
+            h-20
+            shrink-0
+            items-center
+            justify-center
+          "
+        >
+          <button
+            onClick={onToggle}
+            className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              text-slate-600
+              transition
+              hover:bg-slate-100
+              hover:text-slate-900
+            "
+            title="Abrir/fechar menu"
+          >
+            <Menu size={22} />
+          </button>
+        </div>
 
         {/* Navegação */}
         <nav
@@ -76,6 +116,7 @@ export function Sidebar({
             space-y-2
             overflow-y-auto
             py-6
+
             ${collapsed ? 'px-2' : 'px-4'}
           `}
         >
@@ -102,11 +143,13 @@ export function Sidebar({
                   font-medium
                   transition-all
                   duration-200
+
                   ${
                     collapsed
                       ? 'justify-center px-0'
                       : 'gap-3 px-4'
                   }
+
                   ${
                     active
                       ? 'bg-blue-50 text-blue-700'
@@ -130,6 +173,71 @@ export function Sidebar({
             );
           })}
         </nav>
+
+        {/* Usuário - Rodapé */}
+        <div
+          className="
+            shrink-0
+            p-4
+          "
+        >
+          <div
+            className={`
+              flex
+              items-center
+              rounded-xl
+              bg-slate-50
+              p-3
+
+              ${
+                collapsed
+                  ? 'justify-center'
+                  : 'gap-3'
+              }
+            `}
+          >
+            {/* Avatar */}
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
+              {inicial}
+            </div>
+
+            {/* Informações */}
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-slate-900">
+                  {usuario.nome}
+                </p>
+
+                <p className="truncate text-xs text-slate-500">
+                  {usuario.cargo}
+                </p>
+              </div>
+            )}
+
+            {/* Logout */}
+            {!collapsed && (
+              <button
+                onClick={() => console.log('logout')}
+                title="Sair"
+                className="
+                  flex
+                  h-8
+                  w-8
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-lg
+                  text-slate-400
+                  transition
+                  hover:bg-red-50
+                  hover:text-red-600
+                "
+              >
+                <LogOut size={17} />
+              </button>
+            )}
+          </div>
+        </div>
       </aside>
     </>
   );
