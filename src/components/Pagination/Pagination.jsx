@@ -8,24 +8,31 @@ export function Pagination({
   totalPages = 1,
   onPageChange,
 }) {
+  const safeTotalPages = Math.max(1, totalPages);
+
+  const safeCurrentPage = Math.min(
+    Math.max(1, currentPage),
+    safeTotalPages
+  );
+
   const handlePrevious = () => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
+    if (safeCurrentPage > 1) {
+      onPageChange?.(safeCurrentPage - 1);
     }
   };
 
   const handleNext = () => {
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
+    if (safeCurrentPage < safeTotalPages) {
+      onPageChange?.(safeCurrentPage + 1);
     }
   };
 
   const getPages = () => {
     const pages = [];
 
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+    if (safeTotalPages <= 7) {
+      for (let page = 1; page <= safeTotalPages; page++) {
+        pages.push(page);
       }
 
       return pages;
@@ -33,47 +40,74 @@ export function Pagination({
 
     pages.push(1);
 
-    if (currentPage > 3) {
-      pages.push('...');
+    if (safeCurrentPage > 3) {
+      pages.push('ellipsis-left');
     }
 
-    const start = Math.max(2, currentPage - 1);
-    const end = Math.min(totalPages - 1, currentPage + 1);
+    const startPage = Math.max(
+      2,
+      safeCurrentPage - 1
+    );
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
+    const endPage = Math.min(
+      safeTotalPages - 1,
+      safeCurrentPage + 1
+    );
+
+    for (
+      let page = startPage;
+      page <= endPage;
+      page++
+    ) {
+      pages.push(page);
     }
 
-    if (currentPage < totalPages - 2) {
-      pages.push('...');
+    if (safeCurrentPage < safeTotalPages - 2) {
+      pages.push('ellipsis-right');
     }
 
-    pages.push(totalPages);
+    pages.push(safeTotalPages);
 
     return pages;
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
-
+    <div
+      className="
+        flex
+        flex-col
+        gap-4
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        p-5
+        shadow-sm
+        md:flex-row
+        md:items-center
+        md:justify-between
+      "
+    >
       {/* Informação */}
       <div className="text-sm text-slate-500">
         Página{' '}
         <span className="font-semibold text-slate-900">
-          {currentPage}
+          {safeCurrentPage}
         </span>{' '}
         de{' '}
         <span className="font-semibold text-slate-900">
-          {totalPages}
+          {safeTotalPages}
         </span>
       </div>
 
       {/* Navegação */}
       <div className="flex items-center gap-2">
-
+        {/* Página anterior */}
         <button
+          type="button"
           onClick={handlePrevious}
-          disabled={currentPage === 1}
+          disabled={safeCurrentPage === 1}
+          aria-label="Ir para a página anterior"
           className="
             flex
             items-center
@@ -87,37 +121,59 @@ export function Pagination({
             text-sm
             font-medium
             text-slate-600
-            transition
-
+            transition-all
+            duration-200
             hover:border-blue-300
             hover:bg-blue-50
             hover:text-blue-700
-
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-500/20
             disabled:cursor-not-allowed
             disabled:opacity-40
           "
         >
-          <ChevronLeft size={18} />
+          <ChevronLeft
+            size={18}
+            strokeWidth={2}
+          />
+
           Anterior
         </button>
 
-        {getPages().map((page, index) => {
-
-          if (page === '...') {
+        {/* Páginas */}
+        {getPages().map((page) => {
+          if (
+            page === 'ellipsis-left' ||
+            page === 'ellipsis-right'
+          ) {
             return (
               <span
-                key={`ellipsis-${index}`}
+                key={page}
                 className="px-2 text-slate-400"
+                aria-hidden="true"
               >
                 ...
               </span>
             );
           }
 
+          const isCurrentPage =
+            safeCurrentPage === page;
+
           return (
             <button
               key={page}
-              onClick={() => onPageChange(page)}
+              type="button"
+              onClick={() =>
+                onPageChange?.(page)
+              }
+              aria-label={`Ir para a página ${page}`}
+              aria-current={
+                isCurrentPage
+                  ? 'page'
+                  : undefined
+              }
               className={`
                 flex
                 h-10
@@ -128,9 +184,13 @@ export function Pagination({
                 text-sm
                 font-semibold
                 transition-all
+                duration-200
+                focus:outline-none
+                focus:ring-2
+                focus:ring-blue-500/20
 
                 ${
-                  currentPage === page
+                  isCurrentPage
                     ? `
                       bg-blue-600
                       text-white
@@ -141,7 +201,6 @@ export function Pagination({
                       border-slate-200
                       bg-white
                       text-slate-600
-
                       hover:border-blue-300
                       hover:bg-blue-50
                       hover:text-blue-700
@@ -152,12 +211,16 @@ export function Pagination({
               {page}
             </button>
           );
-
         })}
 
+        {/* Próxima página */}
         <button
+          type="button"
           onClick={handleNext}
-          disabled={currentPage === totalPages}
+          disabled={
+            safeCurrentPage === safeTotalPages
+          }
+          aria-label="Ir para a próxima página"
           className="
             flex
             items-center
@@ -171,22 +234,26 @@ export function Pagination({
             text-sm
             font-medium
             text-slate-600
-            transition
-
+            transition-all
+            duration-200
             hover:border-blue-300
             hover:bg-blue-50
             hover:text-blue-700
-
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-500/20
             disabled:cursor-not-allowed
             disabled:opacity-40
           "
         >
           Próxima
-          <ChevronRight size={18} />
+
+          <ChevronRight
+            size={18}
+            strokeWidth={2}
+          />
         </button>
-
       </div>
-
     </div>
   );
 }

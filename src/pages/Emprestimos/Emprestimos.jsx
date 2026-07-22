@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import {
   Layout,
   EmptyState,
@@ -6,8 +7,14 @@ import {
   EmprestimoModal,
   EmprestimoTable,
 } from '../../components';
+
 import { ClipboardList } from 'lucide-react';
+
 import { useEmprestimos } from '../../hooks/useEmprestimos';
+
+import { EmprestimoStats } from '../../components/Emprestimos/EmprestimoStats';
+
+import { EmprestimoQuickActions } from '../../components/Emprestimos/EmprestimoQuickActions';
 
 export function Emprestimos() {
   const [searchValue, setSearchValue] = useState('');
@@ -28,60 +35,102 @@ export function Emprestimos() {
     handleCloseModal();
   };
 
+  const handleNovoEmprestimo = () => {
+    setShowModal(true);
+  };
+
+  const handleRegistrarDevolucao = () => {
+    // Fluxo de devolução será conectado posteriormente.
+    console.log('Registrar devolução');
+  };
+
+  const handleAbrirQRCode = () => {
+    // Leitor de QR Code será conectado posteriormente.
+    console.log('Abrir leitor de QR Code');
+  };
+
   const emprestimosFiltrados = useMemo(() => {
     const busca = searchValue.trim().toLowerCase();
 
-    if (!busca) return emprestimos;
+    if (!busca) {
+      return emprestimos;
+    }
 
     return emprestimos.filter((emprestimo) => {
       return (
-        emprestimo.professor?.toLowerCase().includes(busca) ||
-        emprestimo.turma?.toLowerCase().includes(busca) ||
-        emprestimo.notebookId?.toLowerCase().includes(busca)
+        emprestimo.professor
+          ?.toLowerCase()
+          .includes(busca) ||
+        emprestimo.turma
+          ?.toLowerCase()
+          .includes(busca) ||
+        emprestimo.notebookId
+          ?.toLowerCase()
+          .includes(busca)
       );
     });
   }, [emprestimos, searchValue]);
 
+  const hoje = new Date()
+    .toISOString()
+    .split('T')[0];
+
+  const emprestimosAtivos = useMemo(() => {
+    return emprestimos.filter(
+      (emprestimo) =>
+        emprestimo.status === 'ativo'
+    ).length;
+  }, [emprestimos]);
+
+  const emprestimosHoje = useMemo(() => {
+    return emprestimos.filter(
+      (emprestimo) =>
+        emprestimo.dataEmprestimo === hoje
+    ).length;
+  }, [emprestimos, hoje]);
+
+  const devolvidosHoje = useMemo(() => {
+    return emprestimos.filter(
+      (emprestimo) =>
+        emprestimo.status === 'devolvido' &&
+        (
+          emprestimo.dataDevolucao === hoje ||
+          emprestimo.dataDevolvido === hoje
+        )
+    ).length;
+  }, [emprestimos, hoje]);
+
   return (
-    <Layout
-      title="Gerenciar Empréstimos"
-      showSearch
-      searchPlaceholder="Pesquisar por professor, turma ou notebook..."
-      searchValue={searchValue}
-      onSearchChange={setSearchValue}
-    >
+    <Layout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Empréstimos
-            </h2>
 
-            <p className="text-gray-600 mt-1">
-              Gerencie todos os empréstimos de notebooks.
-            </p>
-          </div>
+        {/* Estatísticas */}
+        <EmprestimoStats
+          total={emprestimos.length}
+          ativos={emprestimosAtivos}
+          hoje={emprestimosHoje}
+          devolvidos={devolvidosHoje}
+        />
 
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-          >
-            + Novo Empréstimo
-          </button>
-        </div>
+        {/* Ações */}
+        <EmprestimoQuickActions
+          onNovoEmprestimo={handleNovoEmprestimo}
+          onRegistrarDevolucao={handleRegistrarDevolucao}
+          onAbrirQRCode={handleAbrirQRCode}
+        />
 
         {/* Pesquisa */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
-          <SearchBar
-            placeholder="Pesquisar por professor, turma ou notebook..."
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-        </div>
+        <SearchBar
+          placeholder="Pesquisar por professor, turma ou notebook..."
+          value={searchValue}
+          onChange={(event) =>
+            setSearchValue(event.target.value)
+          }
+        />
 
         {/* Conteúdo */}
         {emprestimosFiltrados.length === 0 ? (
+
           <EmptyState
             title={
               isLoading
@@ -91,14 +140,19 @@ export function Emprestimos() {
             description={
               isLoading
                 ? 'Aguarde alguns instantes.'
-                : 'Clique em "Novo Empréstimo" para registrar um empréstimo.'
+                : searchValue
+                  ? 'Tente realizar uma nova busca.'
+                  : 'Nenhum empréstimo registrado até o momento.'
             }
             icon={ClipboardList}
           />
+
         ) : (
+
           <EmprestimoTable
             emprestimos={emprestimosFiltrados}
           />
+
         )}
 
         {/* Modal */}
@@ -107,6 +161,7 @@ export function Emprestimos() {
           onClose={handleCloseModal}
           onSave={handleSave}
         />
+
       </div>
     </Layout>
   );

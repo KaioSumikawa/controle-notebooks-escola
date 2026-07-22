@@ -34,7 +34,6 @@ export {
   ConfirmModal,
   TurmaModal,
   NotebookModal,
-  EmprestimoModal,
   ProfessorModal,
 } from './Modal';
 
@@ -53,3 +52,24 @@ export { TurmaTable } from './TurmaTable';
 export { ProfessorTable } from './ProfessorTable';
 export { HistoricoTable } from './HistoricoTable';
 export { DevolucaoTable } from './DevolucaoTable';
+
+/* Componentes de Empréstimos */
+export {
+  EmprestimoModal,
+} from './EmprestimoModal/EmprestimoModal';
+
+export {
+  EmprestimoStats,
+} from './Emprestimos/EmprestimoStats';
+
+export {
+  EmprestimoFilters,
+} from './Emprestimos/EmprestimoFilters';
+
+export {
+  EmprestimoQuickActions,
+} from './Emprestimos/EmprestimoQuickActions';
+
+export {
+  EmprestimoQRCode,
+} from './Emprestimos/EmprestimoQRCode';
