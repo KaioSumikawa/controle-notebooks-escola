@@ -3,7 +3,6 @@ import { useMemo, useState } from 'react';
 import {
   Layout,
   EmptyState,
-  SearchBar,
   EmprestimoModal,
   EmprestimoTable,
 } from '../../components';
@@ -13,11 +12,12 @@ import { ClipboardList } from 'lucide-react';
 import { useEmprestimos } from '../../hooks/useEmprestimos';
 
 import { EmprestimoStats } from '../../components/Emprestimos/EmprestimoStats';
-
 import { EmprestimoQuickActions } from '../../components/Emprestimos/EmprestimoQuickActions';
 
 export function Emprestimos() {
   const [searchValue, setSearchValue] = useState('');
+  const [status, setStatus] = useState('todos');
+  const [period, setPeriod] = useState('todos');
   const [showModal, setShowModal] = useState(false);
 
   const {
@@ -40,24 +40,25 @@ export function Emprestimos() {
   };
 
   const handleRegistrarDevolucao = () => {
-    // Fluxo de devolução será conectado posteriormente.
     console.log('Registrar devolução');
   };
 
   const handleAbrirQRCode = () => {
-    // Leitor de QR Code será conectado posteriormente.
     console.log('Abrir leitor de QR Code');
+  };
+
+  const handleClearFilters = () => {
+    setSearchValue('');
+    setStatus('todos');
+    setPeriod('todos');
   };
 
   const emprestimosFiltrados = useMemo(() => {
     const busca = searchValue.trim().toLowerCase();
 
-    if (!busca) {
-      return emprestimos;
-    }
-
     return emprestimos.filter((emprestimo) => {
-      return (
+      const correspondeBusca =
+        !busca ||
         emprestimo.professor
           ?.toLowerCase()
           .includes(busca) ||
@@ -66,10 +67,27 @@ export function Emprestimos() {
           .includes(busca) ||
         emprestimo.notebookId
           ?.toLowerCase()
-          .includes(busca)
+          .includes(busca);
+
+      const correspondeStatus =
+        status === 'todos' ||
+        emprestimo.status === status;
+
+      // Preparado para implementar depois
+      const correspondePeriodo = true;
+
+      return (
+        correspondeBusca &&
+        correspondeStatus &&
+        correspondePeriodo
       );
     });
-  }, [emprestimos, searchValue]);
+  }, [
+    emprestimos,
+    searchValue,
+    status,
+    period,
+  ]);
 
   const hoje = new Date()
     .toISOString()
@@ -104,7 +122,6 @@ export function Emprestimos() {
     <Layout>
       <div className="space-y-6">
 
-        {/* Estatísticas */}
         <EmprestimoStats
           total={emprestimos.length}
           ativos={emprestimosAtivos}
@@ -112,23 +129,12 @@ export function Emprestimos() {
           devolvidos={devolvidosHoje}
         />
 
-        {/* Ações */}
         <EmprestimoQuickActions
           onNovoEmprestimo={handleNovoEmprestimo}
           onRegistrarDevolucao={handleRegistrarDevolucao}
           onAbrirQRCode={handleAbrirQRCode}
         />
 
-        {/* Pesquisa */}
-        <SearchBar
-          placeholder="Pesquisar por professor, turma ou notebook..."
-          value={searchValue}
-          onChange={(event) =>
-            setSearchValue(event.target.value)
-          }
-        />
-
-        {/* Conteúdo */}
         {emprestimosFiltrados.length === 0 ? (
 
           <EmptyState
@@ -140,9 +146,7 @@ export function Emprestimos() {
             description={
               isLoading
                 ? 'Aguarde alguns instantes.'
-                : searchValue
-                  ? 'Tente realizar uma nova busca.'
-                  : 'Nenhum empréstimo registrado até o momento.'
+                : 'Tente ajustar os filtros ou cadastrar um novo empréstimo.'
             }
             icon={ClipboardList}
           />
@@ -151,11 +155,21 @@ export function Emprestimos() {
 
           <EmprestimoTable
             emprestimos={emprestimosFiltrados}
+            searchValue={searchValue}
+            onSearchChange={(event) =>
+              setSearchValue(event.target.value)
+            }
+            status={status}
+            onStatusChange={setStatus}
+            period={period}
+            onPeriodChange={setPeriod}
+            onClearFilters={handleClearFilters}
+            onNovoEmprestimo={handleNovoEmprestimo}
+            total={emprestimosFiltrados.length}
           />
 
         )}
 
-        {/* Modal */}
         <EmprestimoModal
           isOpen={showModal}
           onClose={handleCloseModal}

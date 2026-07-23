@@ -1,14 +1,24 @@
 import {
   MoreVertical,
-  UserRound,
   Users,
   Laptop,
   CalendarDays,
   CircleCheck,
 } from 'lucide-react';
+import { SearchBar } from '../SearchBar';
+import { EmprestimoFilters } from '../Emprestimos/EmprestimoFilters';
 
 export function EmprestimoTable({
   emprestimos = [],
+  searchValue,
+  onSearchChange,
+  status,
+  onStatusChange,
+  period,
+  onPeriodChange,
+  total = emprestimos.length,
+  inicio = total > 0 ? 1 : 0,
+  fim = emprestimos.length,
 }) {
   const formatarData = (data) => {
     if (!data) {
@@ -24,6 +34,15 @@ export function EmprestimoTable({
     return dataObj.toLocaleDateString('pt-BR');
   };
 
+  // Função auxiliar para gerar as iniciais do professor de forma segura
+  const obterIniciais = (nome) => {
+    if (!nome || nome === '-') return '-';
+    const partes = nome.trim().split(' ').filter(Boolean);
+    if (partes.length === 0) return '-';
+    if (partes.length === 1) return partes[0].substring(0, 2).toUpperCase();
+    return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+  };
+
   return (
     <section
       className="
@@ -35,15 +54,34 @@ export function EmprestimoTable({
         shadow-sm
       "
     >
-      {/* Tabela */}
-      <div className="overflow-x-auto">
+      {/* Toolbar superior com pesquisa e filtros ajustados para ocupar mais espaço */}
+      <div className="flex flex-col gap-4 border-b border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full sm:w-3/5">
+          <SearchBar
+            placeholder="Pesquisar por professor, turma ou notebook..."
+            value={searchValue}
+            onChange={onSearchChange}
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-4 sm:justify-end">
+          <EmprestimoFilters
+            status={status}
+            onStatusChange={onStatusChange}
+            period={period}
+            onPeriodChange={onPeriodChange}
+          />
+        </div>
+      </div>
+
+      {/* Tabela com scroll adaptável e cabeçalho sticky com sombra */}
+      <div className="max-h-[calc(100vh-320px)] overflow-auto overflow-x-auto">
         <table className="w-full min-w-[1050px] text-left text-sm">
-          <thead className="border-b border-slate-200 bg-slate-50/70">
+          <thead className="sticky top-0 z-10 border-b border-slate-200 bg-white shadow-sm">
             <tr>
               <th
                 className="
-                  px-6
-                  py-4
+                  px-5
+                  py-3.5
                   text-xs
                   font-semibold
                   uppercase
@@ -56,8 +94,8 @@ export function EmprestimoTable({
 
               <th
                 className="
-                  px-6
-                  py-4
+                  px-5
+                  py-3.5
                   text-xs
                   font-semibold
                   uppercase
@@ -70,8 +108,8 @@ export function EmprestimoTable({
 
               <th
                 className="
-                  px-6
-                  py-4
+                  px-5
+                  py-3.5
                   text-xs
                   font-semibold
                   uppercase
@@ -84,8 +122,8 @@ export function EmprestimoTable({
 
               <th
                 className="
-                  px-6
-                  py-4
+                  px-5
+                  py-3.5
                   text-xs
                   font-semibold
                   uppercase
@@ -98,8 +136,8 @@ export function EmprestimoTable({
 
               <th
                 className="
-                  px-6
-                  py-4
+                  px-5
+                  py-3.5
                   text-xs
                   font-semibold
                   uppercase
@@ -112,8 +150,8 @@ export function EmprestimoTable({
 
               <th
                 className="
-                  px-6
-                  py-4
+                  px-5
+                  py-3.5
                   text-xs
                   font-semibold
                   uppercase
@@ -126,8 +164,8 @@ export function EmprestimoTable({
 
               <th
                 className="
-                  px-6
-                  py-4
+                  px-5
+                  py-3.5
                   text-right
                   text-xs
                   font-semibold
@@ -148,19 +186,25 @@ export function EmprestimoTable({
                   colSpan={7}
                   className="
                     px-6
-                    py-14
+                    py-16
                     text-center
-                    text-sm
-                    text-slate-500
                   "
                 >
-                  Nenhum empréstimo encontrado.
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-slate-700">
+                        Nenhum empréstimo encontrado.
+                      </p>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        Tente ajustar os filtros ou realizar uma nova busca.
+                      </p>
+                    </div>
+                  </div>
                 </td>
               </tr>
             ) : (
               emprestimos.map((emprestimo) => {
-                const statusAtivo =
-                  emprestimo.status === 'ativo';
+                const statusAtivo = emprestimo.status === 'ativo';
 
                 return (
                   <tr
@@ -168,12 +212,12 @@ export function EmprestimoTable({
                     className="
                       group
                       transition-colors
-                      duration-150
+                      duration-200
                       hover:bg-slate-50/70
                     "
                   >
-                    {/* Professor */}
-                    <td className="px-6 py-5">
+                    {/* Professor com Avatar em Gradiente */}
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div
                           className="
@@ -184,14 +228,16 @@ export function EmprestimoTable({
                             items-center
                             justify-center
                             rounded-full
-                            bg-blue-50
+                            bg-gradient-to-br
+                            from-blue-500
+                            to-blue-600
+                            text-xs
+                            font-bold
+                            text-white
+                            shadow-sm
                           "
                         >
-                          <UserRound
-                            size={18}
-                            strokeWidth={1.8}
-                            className="text-blue-600"
-                          />
+                          {obterIniciais(emprestimo.professor)}
                         </div>
 
                         <div className="min-w-0">
@@ -220,7 +266,7 @@ export function EmprestimoTable({
                     </td>
 
                     {/* Turma */}
-                    <td className="px-6 py-5">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5">
                         <Users
                           size={17}
@@ -241,7 +287,7 @@ export function EmprestimoTable({
                     </td>
 
                     {/* Notebook */}
-                    <td className="px-6 py-5">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5">
                         <Laptop
                           size={18}
@@ -277,7 +323,7 @@ export function EmprestimoTable({
                     </td>
 
                     {/* Data do empréstimo */}
-                    <td className="px-6 py-5">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5">
                         <CalendarDays
                           size={17}
@@ -293,9 +339,7 @@ export function EmprestimoTable({
                               text-slate-700
                             "
                           >
-                            {formatarData(
-                              emprestimo.dataEmprestimo
-                            )}
+                            {formatarData(emprestimo.dataEmprestimo)}
                           </p>
 
                           {emprestimo.horaEmprestimo && (
@@ -314,7 +358,7 @@ export function EmprestimoTable({
                     </td>
 
                     {/* Previsão de devolução */}
-                    <td className="px-6 py-5">
+                    <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5">
                         <CalendarDays
                           size={17}
@@ -330,9 +374,7 @@ export function EmprestimoTable({
                               text-slate-700
                             "
                           >
-                            {formatarData(
-                              emprestimo.dataDevolucaoPrevista
-                            )}
+                            {formatarData(emprestimo.dataDevolucaoPrevista)}
                           </p>
 
                           {emprestimo.horaDevolucaoPrevista && (
@@ -343,80 +385,72 @@ export function EmprestimoTable({
                                 text-slate-500
                               "
                             >
-                              {
-                                emprestimo.horaDevolucaoPrevista
-                              }
+                              {emprestimo.horaDevolucaoPrevista}
                             </p>
                           )}
                         </div>
                       </div>
                     </td>
 
-                    {/* Status */}
-                    <td className="px-6 py-5">
+                    {/* Status badges refinadas com select-none e py-1.5 */}
+                    <td className="px-5 py-4">
                       {statusAtivo ? (
                         <span
                           className="
                             inline-flex
+                            select-none
                             items-center
                             gap-1.5
                             whitespace-nowrap
                             rounded-full
                             bg-emerald-50
-                            px-3
+                            px-3.5
                             py-1.5
-                            text-xs
+                            text-sm
                             font-semibold
                             text-emerald-700
                           "
                         >
-                          <CircleCheck
-                            size={14}
-                            strokeWidth={2}
-                          />
-
+                          <CircleCheck size={16} strokeWidth={2} />
                           Em uso
                         </span>
                       ) : (
                         <span
                           className="
                             inline-flex
+                            select-none
                             items-center
                             gap-1.5
                             whitespace-nowrap
                             rounded-full
                             bg-slate-100
-                            px-3
+                            px-3.5
                             py-1.5
-                            text-xs
+                            text-sm
                             font-semibold
                             text-slate-600
                           "
                         >
-                          <CircleCheck
-                            size={14}
-                            strokeWidth={2}
-                          />
-
+                          <CircleCheck size={16} strokeWidth={2} />
                           Devolvido
                         </span>
                       )}
                     </td>
 
-                    {/* Ações */}
-                    <td className="px-6 py-5 text-right">
+                    {/* Ações com botão otimizado */}
+                    <td className="px-5 py-4 text-right">
                       <button
                         type="button"
                         className="
                           inline-flex
-                          h-9
-                          w-9
+                          h-10
+                          w-10
                           items-center
                           justify-center
                           rounded-lg
                           text-slate-400
                           transition-colors
-                          duration-150
+                          duration-200
                           hover:bg-slate-100
                           hover:text-slate-700
                           focus:outline-none
@@ -425,15 +459,11 @@ export function EmprestimoTable({
                           focus:ring-offset-2
                         "
                         title="Mais opções"
-                        aria-label={`
-                          Mais opções para o empréstimo de
-                          ${emprestimo.professor || 'professor'}
-                        `}
+                        aria-label={`Mais opções para o empréstimo de ${
+                          emprestimo.professor || 'professor'
+                        }`}
                       >
-                        <MoreVertical
-                          size={18}
-                          strokeWidth={2}
-                        />
+                        <MoreVertical size={18} strokeWidth={2} />
                       </button>
                     </td>
                   </tr>
@@ -442,6 +472,36 @@ export function EmprestimoTable({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Rodapé com fundo totalmente branco e paginação dinâmica */}
+      <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 bg-white px-6 py-3.5 sm:flex-row">
+        <p className="text-xs text-slate-500">
+          Mostrando <span className="font-semibold text-slate-700">{inicio}-{fim}</span> de <span className="font-semibold text-slate-700">{total}</span> registros
+        </p>
+
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-400 shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            &lt;
+          </button>
+          <button
+            type="button"
+            className="rounded-lg border border-blue-500 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600 shadow-sm"
+          >
+            1
+          </button>
+          <button
+            type="button"
+            disabled
+            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-400 shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            &gt;
+          </button>
+        </div>
       </div>
     </section>
   );

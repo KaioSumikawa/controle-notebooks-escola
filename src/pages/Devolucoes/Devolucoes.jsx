@@ -3,6 +3,7 @@ import {
   EmptyState,
   SearchBar,
 } from '../../components';
+import QRCodeActionCard from '../../components/QRCodeActionCard/QRCodeActionCard';
 import { Package, RotateCcw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useEmprestimos } from '../../hooks/useEmprestimos';
@@ -43,6 +44,11 @@ export function Devolucoes() {
     await handleDevolver(id);
   };
 
+  const handleOpenScanner = () => {
+    // Futuramente abrirá o modal da câmera
+    console.log('Abrir scanner QR Code');
+  };
+
   return (
     <Layout
       title="Gerenciar Devoluções"
@@ -50,19 +56,8 @@ export function Devolucoes() {
       searchValue={searchValue}
     >
       <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Devoluções
-          </h2>
-
-          <p className="text-gray-600 mt-1">
-            Registre a devolução dos notebooks emprestados.
-          </p>
-        </div>
-
         {/* Pesquisa */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4 card-shadow">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 card-shadow">
           <SearchBar
             placeholder="Pesquisar por professor, turma ou notebook..."
             value={searchValue}
@@ -78,10 +73,10 @@ export function Devolucoes() {
             icon={Package}
           />
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 card-shadow overflow-hidden">
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white card-shadow">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="border-b border-gray-200 bg-gray-50">
                   <tr>
                     <th className="px-6 py-4 text-left font-semibold">
                       Notebook
@@ -109,7 +104,7 @@ export function Devolucoes() {
                   {emprestimosAtivos.map((emprestimo) => (
                     <tr
                       key={emprestimo.id}
-                      className="border-b border-gray-100 hover:bg-gray-50"
+                      className="border-b border-gray-100 transition-colors hover:bg-gray-50"
                     >
                       <td className="px-6 py-4 font-medium">
                         {emprestimo.notebookId}
@@ -134,7 +129,7 @@ export function Devolucoes() {
                             onClick={() =>
                               registrarDevolucao(emprestimo.id)
                             }
-                            className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                            className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
                           >
                             <RotateCcw size={16} />
                             Registrar Devolução
@@ -148,6 +143,14 @@ export function Devolucoes() {
             </div>
           </div>
         )}
+
+        {/* Ação rápida por QR Code */}
+        <QRCodeActionCard
+          title="Devolução rápida com QR Code"
+          description="Escaneie o código do notebook para localizar automaticamente o empréstimo ativo e registrar a devolução em poucos segundos."
+          buttonText="Escanear QR Code"
+          onScan={handleOpenScanner}
+        />
       </div>
     </Layout>
   );

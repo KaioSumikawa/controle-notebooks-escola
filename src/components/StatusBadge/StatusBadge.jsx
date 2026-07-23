@@ -34,19 +34,31 @@ const variants = {
     dot: 'bg-orange-500',
   },
 
+  devolvido: {
+    container: 'bg-green-50 border-green-200 text-green-700',
+    dot: 'bg-green-500',
+  },
+
+  atrasado: {
+    container: 'bg-red-50 border-red-200 text-red-700',
+    dot: 'bg-red-500',
+  },
+
   default: {
     container: 'bg-slate-100 border-slate-200 text-slate-700',
     dot: 'bg-slate-500',
   },
 };
 
+
 export function StatusBadge({ status = '' }) {
-  const key = status
+  const normalizedStatus = String(status)
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
 
-  const style = variants[key] || variants.default;
+  const style = variants[normalizedStatus] || variants.default;
 
   return (
     <span
@@ -72,7 +84,9 @@ export function StatusBadge({ status = '' }) {
         `}
       />
 
-      {status}
+      {status || 'Sem status'}
     </span>
   );
 }
+
+export default StatusBadge;

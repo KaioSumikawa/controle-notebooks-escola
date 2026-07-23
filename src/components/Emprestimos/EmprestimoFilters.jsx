@@ -1,27 +1,26 @@
 import {
   Filter,
+  CalendarDays,
   ChevronDown,
-  X,
 } from 'lucide-react';
 
 export function EmprestimoFilters({
   status = 'todos',
+  period = '30dias',
   onStatusChange,
-  onClear,
+  onPeriodChange,
 }) {
-  const hasActiveFilters = status !== 'todos';
-
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {/* Filtro de status */}
+      {/* Status */}
       <div className="relative">
         <Filter
-          size={16}
+          size={18}
           strokeWidth={2}
           className="
             pointer-events-none
             absolute
-            left-3
+            left-4
             top-1/2
             -translate-y-1/2
             text-slate-400
@@ -30,41 +29,44 @@ export function EmprestimoFilters({
 
         <select
           value={status}
-          onChange={(event) => {
-            onStatusChange?.(event.target.value);
-          }}
-          aria-label="Filtrar empréstimos por status"
+          onChange={(event) =>
+            onStatusChange?.(event.target.value)
+          }
+          aria-label="Filtrar por status"
           className="
-            h-10
+            h-12
+            min-w-[190px]
             appearance-none
-            rounded-xl
+            rounded-2xl
             border
             border-slate-200
             bg-white
-            pl-9
+            pl-11
             pr-10
             text-sm
             font-medium
             text-slate-700
+            shadow-sm
             outline-none
             transition-all
             duration-200
             hover:border-slate-300
+            hover:shadow
             focus:border-blue-500
             focus:ring-4
             focus:ring-blue-500/10
           "
         >
           <option value="todos">
-            Todos os status
+            Status: Todos
           </option>
 
           <option value="ativo">
-            Em uso
+            Status: Em uso
           </option>
 
           <option value="devolvido">
-            Devolvidos
+            Status: Devolvidos
           </option>
         </select>
 
@@ -74,7 +76,7 @@ export function EmprestimoFilters({
           className="
             pointer-events-none
             absolute
-            right-3
+            right-4
             top-1/2
             -translate-y-1/2
             text-slate-400
@@ -82,39 +84,85 @@ export function EmprestimoFilters({
         />
       </div>
 
-      {/* Limpar filtros */}
-      {hasActiveFilters && (
-        <button
-          type="button"
-          onClick={onClear}
+      {/* Período */}
+      <div className="relative">
+        <CalendarDays
+          size={18}
+          strokeWidth={2}
           className="
-            inline-flex
-            h-10
-            items-center
-            gap-2
-            rounded-xl
-            px-3
+            pointer-events-none
+            absolute
+            left-4
+            top-1/2
+            -translate-y-1/2
+            text-slate-400
+          "
+        />
+
+        <select
+          value={period}
+          onChange={(event) =>
+            onPeriodChange?.(event.target.value)
+          }
+          aria-label="Filtrar por período"
+          className="
+            h-12
+            min-w-[220px]
+            appearance-none
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            pl-11
+            pr-10
             text-sm
             font-medium
-            text-slate-500
+            text-slate-700
+            shadow-sm
+            outline-none
             transition-all
             duration-200
-            hover:bg-slate-100
-            hover:text-slate-700
-            focus:outline-none
-            focus:ring-2
-            focus:ring-slate-300
-            focus:ring-offset-1
+            hover:border-slate-300
+            hover:shadow
+            focus:border-blue-500
+            focus:ring-4
+            focus:ring-blue-500/10
           "
         >
-          <X
-            size={16}
-            strokeWidth={2}
-          />
+          <option value="hoje">
+            Período: Hoje
+          </option>
 
-          Limpar filtros
-        </button>
-      )}
+          <option value="7dias">
+            Período: Últimos 7 dias
+          </option>
+
+          <option value="30dias">
+            Período: Últimos 30 dias
+          </option>
+
+          <option value="mes">
+            Período: Este mês
+          </option>
+
+          <option value="todos">
+            Período: Todo o período
+          </option>
+        </select>
+
+        <ChevronDown
+          size={16}
+          strokeWidth={2}
+          className="
+            pointer-events-none
+            absolute
+            right-4
+            top-1/2
+            -translate-y-1/2
+            text-slate-400
+          "
+        />
+      </div>
     </div>
   );
 }

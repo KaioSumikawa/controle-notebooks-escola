@@ -74,6 +74,7 @@ export function Pagination({
   return (
     <div
       className="
+        mt-6
         flex
         flex-col
         gap-4
@@ -81,8 +82,10 @@ export function Pagination({
         border
         border-slate-200
         bg-white
-        p-5
+        px-5
+        py-4
         shadow-sm
+
         md:flex-row
         md:items-center
         md:justify-between
@@ -101,15 +104,15 @@ export function Pagination({
       </div>
 
       {/* Navegação */}
-      <div className="flex items-center gap-2">
-        {/* Página anterior */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Anterior */}
         <button
           type="button"
           onClick={handlePrevious}
           disabled={safeCurrentPage === 1}
-          aria-label="Ir para a página anterior"
+          aria-label="Página anterior"
           className="
-            flex
+            inline-flex
             items-center
             gap-2
             rounded-xl
@@ -118,30 +121,27 @@ export function Pagination({
             bg-white
             px-4
             py-2
+
             text-sm
             font-medium
             text-slate-600
+
             transition-all
             duration-200
+
             hover:border-blue-300
             hover:bg-blue-50
             hover:text-blue-700
-            focus:outline-none
-            focus:ring-2
-            focus:ring-blue-500/20
+
             disabled:cursor-not-allowed
             disabled:opacity-40
           "
         >
-          <ChevronLeft
-            size={18}
-            strokeWidth={2}
-          />
-
+          <ChevronLeft size={18} />
           Anterior
         </button>
 
-        {/* Páginas */}
+        {/* Números */}
         {getPages().map((page) => {
           if (
             page === 'ellipsis-left' ||
@@ -151,15 +151,14 @@ export function Pagination({
               <span
                 key={page}
                 className="px-2 text-slate-400"
-                aria-hidden="true"
               >
                 ...
               </span>
             );
           }
 
-          const isCurrentPage =
-            safeCurrentPage === page;
+          const active =
+            page === safeCurrentPage;
 
           return (
             <button
@@ -168,11 +167,8 @@ export function Pagination({
               onClick={() =>
                 onPageChange?.(page)
               }
-              aria-label={`Ir para a página ${page}`}
               aria-current={
-                isCurrentPage
-                  ? 'page'
-                  : undefined
+                active ? 'page' : undefined
               }
               className={`
                 flex
@@ -181,16 +177,15 @@ export function Pagination({
                 items-center
                 justify-center
                 rounded-xl
+
                 text-sm
                 font-semibold
+
                 transition-all
                 duration-200
-                focus:outline-none
-                focus:ring-2
-                focus:ring-blue-500/20
 
                 ${
-                  isCurrentPage
+                  active
                     ? `
                       bg-blue-600
                       text-white
@@ -201,6 +196,7 @@ export function Pagination({
                       border-slate-200
                       bg-white
                       text-slate-600
+
                       hover:border-blue-300
                       hover:bg-blue-50
                       hover:text-blue-700
@@ -213,16 +209,16 @@ export function Pagination({
           );
         })}
 
-        {/* Próxima página */}
+        {/* Próxima */}
         <button
           type="button"
           onClick={handleNext}
           disabled={
             safeCurrentPage === safeTotalPages
           }
-          aria-label="Ir para a próxima página"
+          aria-label="Próxima página"
           className="
-            flex
+            inline-flex
             items-center
             gap-2
             rounded-xl
@@ -231,27 +227,24 @@ export function Pagination({
             bg-white
             px-4
             py-2
+
             text-sm
             font-medium
             text-slate-600
+
             transition-all
             duration-200
+
             hover:border-blue-300
             hover:bg-blue-50
             hover:text-blue-700
-            focus:outline-none
-            focus:ring-2
-            focus:ring-blue-500/20
+
             disabled:cursor-not-allowed
             disabled:opacity-40
           "
         >
           Próxima
-
-          <ChevronRight
-            size={18}
-            strokeWidth={2}
-          />
+          <ChevronRight size={18} />
         </button>
       </div>
     </div>
