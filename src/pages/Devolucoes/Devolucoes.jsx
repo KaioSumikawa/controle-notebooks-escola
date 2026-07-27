@@ -3,8 +3,14 @@ import {
   EmptyState,
   SearchBar,
 } from '../../components';
+
 import QRCodeActionCard from '../../components/QRCodeActionCard/QRCodeActionCard';
-import { Package, RotateCcw } from 'lucide-react';
+
+import {
+  ClipboardCheck,
+  RotateCcw,
+} from 'lucide-react';
+
 import { useMemo, useState } from 'react';
 import { useEmprestimos } from '../../hooks/useEmprestimos';
 
@@ -12,12 +18,12 @@ export function Devolucoes() {
   const [searchValue, setSearchValue] = useState('');
 
   const {
-    emprestimos,
+    emprestimos = [],
     handleDevolver,
   } = useEmprestimos();
 
   const emprestimosAtivos = useMemo(() => {
-    const busca = searchValue.toLowerCase();
+    const busca = searchValue.trim().toLowerCase();
 
     return emprestimos.filter((emprestimo) => {
       if (emprestimo.status !== 'ativo') {
@@ -25,9 +31,15 @@ export function Devolucoes() {
       }
 
       return (
-        emprestimo.professor.toLowerCase().includes(busca) ||
-        emprestimo.turma.toLowerCase().includes(busca) ||
-        emprestimo.notebookId.toLowerCase().includes(busca)
+        emprestimo.professor
+          ?.toLowerCase()
+          .includes(busca) ||
+        emprestimo.turma
+          ?.toLowerCase()
+          .includes(busca) ||
+        emprestimo.notebookId
+          ?.toLowerCase()
+          .includes(busca)
       );
     });
   }, [emprestimos, searchValue]);
@@ -45,39 +57,59 @@ export function Devolucoes() {
   };
 
   const handleOpenScanner = () => {
-    // Futuramente abrirá o modal da câmera
     console.log('Abrir scanner QR Code');
   };
 
   return (
-    <Layout
-      title="Gerenciar Devoluções"
-      onSearchChange={setSearchValue}
-      searchValue={searchValue}
-    >
-      <div className="space-y-6">
+    <Layout>
+      <div className="space-y-8">
+
         {/* Pesquisa */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 card-shadow">
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <SearchBar
-            placeholder="Pesquisar por professor, turma ou notebook..."
+            placeholder="Pesquisar professor, notebook ou turma..."
             value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
+            onChange={(e) =>
+              setSearchValue(e.target.value)
+            }
           />
         </div>
 
-        {/* Conteúdo */}
+        {/* Lista de devoluções */}
         {emprestimosAtivos.length === 0 ? (
+
           <EmptyState
-            title="Nenhum empréstimo pendente"
-            description="Todos os notebooks já foram devolvidos."
-            icon={Package}
+            title="Nenhuma devolução pendente"
+            description="Todos os notebooks emprestados já foram devolvidos."
+            icon={ClipboardCheck}
           />
+
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white card-shadow">
+
+          <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+
+            {/* Cabeçalho */}
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Empréstimos Pendentes
+                </h2>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Registre rapidamente a devolução dos notebooks ativos.
+                </p>
+              </div>
+
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                {emprestimosAtivos.length} pendente
+                {emprestimosAtivos.length > 1 && 's'}
+              </span>
+            </div>
+
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-gray-200 bg-gray-50">
-                  <tr>
+              <table className="min-w-full text-sm">
+                <thead className="sticky top-0 border-b border-slate-200 bg-slate-50">
+                  <tr className="text-slate-600">
                     <th className="px-6 py-4 text-left font-semibold">
                       Notebook
                     </th>
@@ -91,7 +123,7 @@ export function Devolucoes() {
                     </th>
 
                     <th className="px-6 py-4 text-left font-semibold">
-                      Data
+                      Data do Empréstimo
                     </th>
 
                     <th className="px-6 py-4 text-center font-semibold">
@@ -104,32 +136,54 @@ export function Devolucoes() {
                   {emprestimosAtivos.map((emprestimo) => (
                     <tr
                       key={emprestimo.id}
-                      className="border-b border-gray-100 transition-colors hover:bg-gray-50"
+                      className="border-b border-slate-100 transition-all duration-200 hover:bg-slate-50"
                     >
-                      <td className="px-6 py-4 font-medium">
-                        {emprestimo.notebookId}
+                      <td className="px-6 py-5">
+                        <span className="font-semibold text-slate-800">
+                          {emprestimo.notebookId}
+                        </span>
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5 text-slate-700">
                         {emprestimo.professor}
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5 text-slate-700">
                         {emprestimo.turma}
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5 text-slate-600">
                         {emprestimo.dataEmprestimo}
                       </td>
 
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-5">
                         <div className="flex justify-center">
                           <button
                             type="button"
                             onClick={() =>
-                              registrarDevolucao(emprestimo.id)
+                              registrarDevolucao(
+                                emprestimo.id
+                              )
                             }
-                            className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-white transition-colors hover:bg-green-700"
+                            className="
+                              inline-flex
+                              items-center
+                              gap-2
+                              rounded-xl
+                              bg-green-600
+                              px-4
+                              py-2.5
+                              text-sm
+                              font-medium
+                              text-white
+                              shadow-sm
+                              transition-all
+                              duration-200
+                              hover:-translate-y-0.5
+                              hover:bg-green-700
+                              hover:shadow-md
+                              active:translate-y-0
+                            "
                           >
                             <RotateCcw size={16} />
                             Registrar Devolução
@@ -141,16 +195,19 @@ export function Devolucoes() {
                 </tbody>
               </table>
             </div>
-          </div>
+
+          </section>
+
         )}
 
-        {/* Ação rápida por QR Code */}
+        {/* QR Code */}
         <QRCodeActionCard
           title="Devolução rápida com QR Code"
           description="Escaneie o código do notebook para localizar automaticamente o empréstimo ativo e registrar a devolução em poucos segundos."
           buttonText="Escanear QR Code"
           onScan={handleOpenScanner}
         />
+
       </div>
     </Layout>
   );

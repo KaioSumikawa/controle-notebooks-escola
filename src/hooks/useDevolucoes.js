@@ -1,4 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+
 import { emprestimoService } from '../services/emprestimoService';
 
 export function useDevolucoes() {
@@ -7,56 +12,88 @@ export function useDevolucoes() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const clearMessages = () => {
+  /**
+   * Limpa mensagens
+   */
+  const clearMessages = useCallback(() => {
     setError('');
     setSuccess('');
-  };
+  }, []);
 
+  /**
+   * Carrega empréstimos ativos
+   * (que representam devoluções pendentes)
+   */
   const fetchDevolucoes = useCallback(async () => {
-    setIsLoading(true);
-
     try {
-      const emprestimos = await emprestimoService.getAll();
+      setIsLoading(true);
+      clearMessages();
+
+      const emprestimos =
+        await emprestimoService.getAll();
 
       const ativos = emprestimos.filter(
-        (emprestimo) => emprestimo.status === 'ativo'
+        (emprestimo) =>
+          emprestimo.status === 'ativo'
       );
 
       setDevolucoes(ativos);
     } catch (err) {
-      setError(err?.message || 'Erro ao carregar devoluções.');
+      console.error(err);
+
+      setError(
+        err?.message ||
+          'Erro ao carregar devoluções.'
+      );
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [clearMessages]);
 
   useEffect(() => {
     fetchDevolucoes();
   }, [fetchDevolucoes]);
 
-  const registrarDevolucao = async (id) => {
-    setIsLoading(true);
-    clearMessages();
+  /**
+   * Registrar devolução
+   */
+  const registrarDevolucao = useCallback(
+    async (id) => {
+      try {
+        setIsLoading(true);
+        clearMessages();
 
-    try {
-      const devolucao = await emprestimoService.devolver(id);
+        const devolucao =
+          await emprestimoService.devolver(id);
 
-      if (!devolucao) {
-        throw new Error('Empréstimo não encontrado.');
+        if (!devolucao) {
+          throw new Error(
+            'Empréstimo não encontrado.'
+          );
+        }
+
+        await fetchDevolucoes();
+
+        setSuccess(
+          'Devolução registrada com sucesso.'
+        );
+
+        return devolucao;
+      } catch (err) {
+        console.error(err);
+
+        setError(
+          err?.message ||
+            'Erro ao registrar devolução.'
+        );
+
+        throw err;
+      } finally {
+        setIsLoading(false);
       }
-
-      await fetchDevolucoes();
-
-      setSuccess('Devolução registrada com sucesso.');
-
-      return devolucao;
-    } catch (err) {
-      setError(err?.message || 'Erro ao registrar devolução.');
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [clearMessages, fetchDevolucoes]
+  );
 
   return {
     devolucoes,

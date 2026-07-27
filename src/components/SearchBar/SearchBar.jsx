@@ -17,12 +17,12 @@ export function SearchBar({
     <div className="relative w-full">
       {/* Ícone */}
       <Search
-        size={19}
+        size={20}
         strokeWidth={2}
         className="
           pointer-events-none
           absolute
-          left-4
+          left-5
           top-1/2
           -translate-y-1/2
           text-slate-400
@@ -39,21 +39,23 @@ export function SearchBar({
         onChange={onChange}
         aria-label="Pesquisar"
         className="
-          h-13
+          h-16
           w-full
+
           rounded-2xl
           border
           border-slate-200
-          bg-slate-50
 
-          pl-12
-          pr-12
+          bg-white
 
-          text-sm
+          pl-14
+          pr-14
+
+          text-[15px]
           font-medium
           text-slate-700
 
-          placeholder:text-slate-500
+          placeholder:text-slate-400
 
           shadow-sm
 
@@ -63,10 +65,8 @@ export function SearchBar({
           duration-200
 
           hover:border-slate-300
-          hover:bg-white
-          hover:shadow
+          hover:shadow-md
 
-          focus:bg-white
           focus:border-blue-500
           focus:ring-4
           focus:ring-blue-500/10
@@ -82,11 +82,12 @@ export function SearchBar({
           aria-label="Limpar pesquisa"
           className="
             absolute
-            right-3
+            right-4
             top-1/2
+
             flex
-            h-8
-            w-8
+            h-9
+            w-9
             -translate-y-1/2
             items-center
             justify-center
@@ -98,7 +99,7 @@ export function SearchBar({
             transition-all
             duration-200
 
-            hover:bg-slate-200
+            hover:bg-slate-100
             hover:text-slate-700
 
             active:scale-95
@@ -109,7 +110,7 @@ export function SearchBar({
           "
         >
           <X
-            size={15}
+            size={16}
             strokeWidth={2}
           />
         </button>
