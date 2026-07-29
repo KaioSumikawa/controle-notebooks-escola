@@ -63,49 +63,26 @@ export function Devolucoes() {
   return (
     <Layout>
       <div className="space-y-8">
-
-        {/* Pesquisa */}
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-          <SearchBar
-            placeholder="Pesquisar professor, notebook ou turma..."
-            value={searchValue}
-            onChange={(e) =>
-              setSearchValue(e.target.value)
-            }
-          />
-        </div>
-
-        {/* Lista de devoluções */}
         {emprestimosAtivos.length === 0 ? (
-
           <EmptyState
             title="Nenhuma devolução pendente"
             description="Todos os notebooks emprestados já foram devolvidos."
             icon={ClipboardCheck}
           />
-
         ) : (
-
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-
-            {/* Cabeçalho */}
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">
-                  Empréstimos Pendentes
-                </h2>
-
-                <p className="mt-1 text-sm text-slate-500">
-                  Registre rapidamente a devolução dos notebooks ativos.
-                </p>
-              </div>
-
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                {emprestimosAtivos.length} pendente
-                {emprestimosAtivos.length > 1 && 's'}
-              </span>
+            {/* Pesquisa */}
+            <div className="border-b border-slate-200 p-5">
+              <SearchBar
+                placeholder="Pesquisar professor, notebook ou turma..."
+                value={searchValue}
+                onChange={(e) =>
+                  setSearchValue(e.target.value)
+                }
+              />
             </div>
 
+            {/* Tabela */}
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead className="sticky top-0 border-b border-slate-200 bg-slate-50">
@@ -195,19 +172,15 @@ export function Devolucoes() {
                 </tbody>
               </table>
             </div>
-
           </section>
-
         )}
 
-        {/* QR Code */}
         <QRCodeActionCard
           title="Devolução rápida com QR Code"
           description="Escaneie o código do notebook para localizar automaticamente o empréstimo ativo e registrar a devolução em poucos segundos."
           buttonText="Escanear QR Code"
           onScan={handleOpenScanner}
         />
-
       </div>
     </Layout>
   );

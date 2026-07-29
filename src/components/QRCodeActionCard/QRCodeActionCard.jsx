@@ -1,7 +1,6 @@
 import {
   Camera,
   QrCode,
-  Sparkles,
 } from 'lucide-react';
 
 export default function QRCodeActionCard({
@@ -11,41 +10,30 @@ export default function QRCodeActionCard({
   onScan,
 }) {
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-r from-blue-50 via-white to-blue-50 shadow-sm transition-all duration-300 hover:shadow-md">
-
+    <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-r from-white via-slate-50 to-blue-50 shadow-sm transition-all duration-300 hover:shadow-md">
       {/* Elementos decorativos */}
-      <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-blue-200/20 blur-3xl" />
-      <div className="absolute -bottom-8 left-1/2 h-32 w-32 rounded-full bg-sky-200/20 blur-3xl" />
+      <div className="absolute -right-20 top-0 h-52 w-52 rounded-full bg-blue-100/30 blur-3xl" />
+      <div className="absolute bottom-0 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full bg-slate-100/60 blur-3xl" />
 
-      <div className="relative flex flex-col gap-8 p-8 lg:flex-row lg:items-center lg:justify-between">
-
+      <div className="relative flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between">
         {/* Conteúdo */}
-        <div className="flex items-center gap-6">
-
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-3xl border border-blue-100 bg-white text-blue-600 shadow-sm">
+        <div className="flex items-center gap-5">
+          <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-white text-blue-600 shadow-sm">
             <QrCode
-              size={52}
-              strokeWidth={1.7}
+              size={38}
+              strokeWidth={1.8}
             />
           </div>
 
           <div>
-
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">
-              <Sparkles size={13} />
-              Recurso Inteligente
-            </div>
-
-            <h3 className="text-2xl font-bold tracking-tight text-slate-900">
+            <h3 className="text-xl font-semibold tracking-tight text-slate-900">
               {title}
             </h3>
 
-            <p className="mt-3 max-w-2xl text-[15px] leading-7 text-slate-600">
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
               {description}
             </p>
-
           </div>
-
         </div>
 
         {/* Botão */}
@@ -54,31 +42,29 @@ export default function QRCodeActionCard({
           onClick={onScan}
           className="
             inline-flex
+            h-11
             items-center
             justify-center
             gap-2
-            rounded-2xl
+            rounded-xl
             bg-blue-600
-            px-7
-            py-3.5
+            px-5
             text-sm
-            font-semibold
+            font-medium
             text-white
             shadow-sm
             transition-all
             duration-200
             hover:-translate-y-0.5
             hover:bg-blue-700
-            hover:shadow-lg
+            hover:shadow-md
             active:translate-y-0
           "
         >
-          <Camera size={18} />
+          <Camera size={17} />
           {buttonText}
         </button>
-
       </div>
-
     </section>
   );
 }

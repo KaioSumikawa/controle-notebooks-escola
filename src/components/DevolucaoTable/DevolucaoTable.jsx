@@ -4,22 +4,67 @@ import {
   MoreVertical,
 } from 'lucide-react';
 
+import { SearchBar } from '../SearchBar';
+import { DevolucaoFilters } from '../Devolucoes/DevolucaoFilters';
+
 export function DevolucaoTable({
   devolucoes = [],
+  searchValue = '',
+  onSearchChange,
+  status = 'todos',
+  onStatusChange,
+  period = 'todos',
+  onPeriodChange,
+  onClearFilters,
 }) {
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
-      <div className="border-b border-slate-200 bg-white px-6 py-5">
-        <h2 className="text-lg font-semibold text-slate-900">
-          Histórico de Devoluções
-        </h2>
+      {/* Cabeçalho */}
+      <div className="border-b border-slate-200 bg-white p-6">
 
-        <p className="mt-1 text-sm text-slate-500">
-          Consulte todas as devoluções registradas no sistema.
-        </p>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">
+              Empréstimos Pendentes
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Registre rapidamente a devolução dos notebooks ativos.
+            </p>
+          </div>
+
+          <span className="inline-flex h-fit items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+            {devolucoes.length} pendentes
+          </span>
+
+        </div>
+
+        {/* Pesquisa + Filtros */}
+        <div className="mt-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+
+          <div className="w-full xl:max-w-xl">
+            <SearchBar
+              placeholder="Pesquisar professor, notebook ou turma..."
+              value={searchValue}
+              onChange={onSearchChange}
+            />
+          </div>
+
+          <DevolucaoFilters
+            status={status}
+            period={period}
+            onStatusChange={onStatusChange}
+            onPeriodChange={onPeriodChange}
+            onClear={onClearFilters}
+          />
+
+        </div>
+
       </div>
 
+      {/* Tabela */}
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
 
@@ -157,6 +202,7 @@ export function DevolucaoTable({
 
         </table>
       </div>
+
     </div>
   );
 }

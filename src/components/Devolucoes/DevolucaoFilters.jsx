@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  ChevronDown,
   Filter,
   X,
 } from 'lucide-react';
@@ -14,10 +15,10 @@ export function DevolucaoFilters({
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
-      <div className="flex flex-1 flex-col gap-4 sm:flex-row">
+      <div className="flex flex-1 flex-col gap-3 sm:flex-row">
 
         {/* Status */}
-        <div className="relative w-full sm:w-56">
+        <div className="relative w-full sm:w-60">
 
           <Filter
             size={18}
@@ -38,7 +39,7 @@ export function DevolucaoFilters({
               border-slate-200
               bg-white
               pl-11
-              pr-10
+              pr-11
               text-sm
               font-medium
               text-slate-700
@@ -47,13 +48,15 @@ export function DevolucaoFilters({
               transition-all
               duration-200
               hover:border-slate-300
+              hover:bg-slate-50
               focus:border-blue-500
+              focus:bg-white
               focus:ring-4
               focus:ring-blue-500/10
             "
           >
             <option value="todos">
-              Todos os Status
+              Todos os status
             </option>
 
             <option value="ativo">
@@ -65,10 +68,15 @@ export function DevolucaoFilters({
             </option>
           </select>
 
+          <ChevronDown
+            size={18}
+            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+          />
+
         </div>
 
         {/* Período */}
-        <div className="relative w-full sm:w-56">
+        <div className="relative w-full sm:w-60">
 
           <CalendarDays
             size={18}
@@ -89,7 +97,7 @@ export function DevolucaoFilters({
               border-slate-200
               bg-white
               pl-11
-              pr-10
+              pr-11
               text-sm
               font-medium
               text-slate-700
@@ -98,7 +106,9 @@ export function DevolucaoFilters({
               transition-all
               duration-200
               hover:border-slate-300
+              hover:bg-slate-50
               focus:border-blue-500
+              focus:bg-white
               focus:ring-4
               focus:ring-blue-500/10
             "
@@ -123,6 +133,11 @@ export function DevolucaoFilters({
               Últimos 90 dias
             </option>
           </select>
+
+          <ChevronDown
+            size={18}
+            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+          />
 
         </div>
 
@@ -152,6 +167,7 @@ export function DevolucaoFilters({
           hover:border-red-200
           hover:bg-red-50
           hover:text-red-600
+          active:scale-[0.98]
         "
       >
         <X size={16} />
